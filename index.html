@@ -249,6 +249,17 @@
       <div class="field"><label>Temp. frigo (°C)</label><input type="number" id="tempFrigo" value="4"></div>
       <div class="field"><label>Ora pasto</label><input type="time" id="eatTime" value="20:00"></div>
     </div>
+    <div class="row2">
+      <div class="field"><label>Giorno pasto</label><input type="date" id="eatDate" value=""></div>
+      <div class="field" style="justify-content:flex-end;padding-bottom:2px">
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn-secondary" style="font-size:11px;padding:5px 10px" onclick="setDay(0)">Oggi</button>
+          <button class="btn-secondary" style="font-size:11px;padding:5px 10px" onclick="setDay(1)">Domani</button>
+          <button class="btn-secondary" style="font-size:11px;padding:5px 10px" onclick="setNextWeekday(6)">Sab</button>
+          <button class="btn-secondary" style="font-size:11px;padding:5px 10px" onclick="setNextWeekday(0)">Dom</button>
+        </div>
+      </div>
+    </div>
 
     <button class="btn-primary" style="margin-top:14px" onclick="calcola()">Calcola impasto</button>
     <div id="output"></div>
@@ -340,17 +351,29 @@ function calcola() {
   const acqua = farina*(idr/100);
   const saleGrammi = farina*(sale/100);
 
+  const eatDateVal = g('eatDate');
   const [h,m] = eatTime.split(':').map(Number);
-  const eatDate = new Date(); eatDate.setHours(h,m,0,0);
+  const eatDate = eatDateVal ? new Date(eatDateVal + 'T' + eatTime) : new Date();
+  if(!eatDateVal) eatDate.setHours(h,m,0,0);
   const stesura = new Date(eatDate.getTime()-30*60000);
   const fuoriFrigo = new Date(stesura.getTime()-ta*3600000);
   const impasto = new Date(fuoriFrigo.getTime()-tf*3600000);
   timerData = {impasto,fuoriFrigo,stesura,eatDate,tf,ta};
 
+  const DAYS = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+  const today = new Date(); today.setHours(0,0,0,0);
   function fmt(d) { return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0'); }
+  function fmtDay(d) {
+    const dd = new Date(d); dd.setHours(0,0,0,0);
+    const diff = Math.round((dd-today)/86400000);
+    if(diff===0) return 'Oggi';
+    if(diff===1) return 'Domani';
+    if(diff===-1) return 'Ieri';
+    return DAYS[d.getDay()]+' '+d.getDate();
+  }
+  function fmtFull(d) { return `<span style="font-size:11px;color:var(--muted);margin-right:6px">${fmtDay(d)}</span>${fmt(d)}`; }
   function isNow(d,next) { const n=Date.now(); return n>=d.getTime()&&n<next.getTime(); }
 
-  // Farine nel mix
   const mixInfo = mixData ? `<div style="font-size:11px;color:var(--muted);margin-bottom:12px">Mix: ${mixData.label}</div>` : '';
 
   document.getElementById('output').innerHTML = `
@@ -368,10 +391,10 @@ ${mixInfo}
   <div class="fb-row"><span class="fb-label">Appretto</span><div class="fb-track"><div class="fb-fill" style="width:${Math.min(100,ta/(tf+ta)*100).toFixed(0)}%;background:#639922"></div></div><span class="fb-val">${ta}h</span></div>
   <div class="divider"></div>
   <div class="sec-title">Programma</div>
-  <div class="tl-item"><div class="tl-dot${isNow(impasto,fuoriFrigo)?' now':''}"></div><span class="tl-label">Impasto</span><span class="tl-time">${fmt(impasto)}</span></div>
-  <div class="tl-item"><div class="tl-dot${isNow(fuoriFrigo,stesura)?' now':''}"></div><span class="tl-label">Fuori dal frigo</span><span class="tl-time">${fmt(fuoriFrigo)}</span></div>
-  <div class="tl-item"><div class="tl-dot${isNow(stesura,eatDate)?' now':''}"></div><span class="tl-label">Stesura</span><span class="tl-time">${fmt(stesura)}</span></div>
-  <div class="tl-item"><div class="tl-dot"></div><span class="tl-label">In tavola</span><span class="tl-time">${fmt(eatDate)}</span></div>
+  <div class="tl-item"><div class="tl-dot${isNow(impasto,fuoriFrigo)?' now':''}"></div><span class="tl-label">Inizia impasto</span><span class="tl-time">${fmtFull(impasto)}</span></div>
+  <div class="tl-item"><div class="tl-dot${isNow(fuoriFrigo,stesura)?' now':''}"></div><span class="tl-label">Fuori dal frigo</span><span class="tl-time">${fmtFull(fuoriFrigo)}</span></div>
+  <div class="tl-item"><div class="tl-dot${isNow(stesura,eatDate)?' now':''}"></div><span class="tl-label">Stesura</span><span class="tl-time">${fmtFull(stesura)}</span></div>
+  <div class="tl-item"><div class="tl-dot"></div><span class="tl-label">In tavola</span><span class="tl-time">${fmtFull(eatDate)}</span></div>
 </div>
 <div class="card">
   <div class="sec-title">Grafico fermentazione</div>
@@ -588,9 +611,25 @@ if('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
 }
 
+// ─── DATE HELPERS ──────────────────────────────────────────────────────────
+function toInputDate(d) {
+  return d.getFullYear()+'-'+(d.getMonth()+1).toString().padStart(2,'0')+'-'+d.getDate().toString().padStart(2,'0');
+}
+function setDay(offsetDays) {
+  const d = new Date(); d.setDate(d.getDate()+offsetDays);
+  document.getElementById('eatDate').value = toInputDate(d);
+}
+function setNextWeekday(wd) {
+  const d = new Date();
+  const diff = (wd - d.getDay() + 7) % 7 || 7;
+  d.setDate(d.getDate()+diff);
+  document.getElementById('eatDate').value = toInputDate(d);
+}
+
 // ─── INIT ──────────────────────────────────────────────────────────────────
 loadPreset('napoletana');
 renderMixer();
+setDay(0);
 </script>
 </body>
 </html>
