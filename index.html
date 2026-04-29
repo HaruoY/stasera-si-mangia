@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stasera si mangia</title>
+  <meta name="description" content="Calcolatore impasto pizza con mixer farine, timer e salvataggio ricette">
+  <meta name="theme-color" content="#1a1a1a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Stasera si mangia">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="icon" href="icons/icon-192.png">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f7f6f2;
+      --card: #ffffff;
+      --border: rgba(0,0,0,0.08);
+      --border-mid: rgba(0,0,0,0.14);
+      --text: #1a1a1a;
+      --muted: #888;
+      --hint: #bbb;
+      --accent: #1a1a1a;
+      --green: #3b6d11;
+      --green-bg: #eaf3de;
+      --amber: #854f0b;
+      --amber-bg: #faeeda;
+      --blue: #185fa5;
+      --blue-bg: #e6f1fb;
+      --rad: 12px;
+      --rad-sm: 8px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #141414;
+        --card: #1e1e1e;
+        --border: rgba(255,255,255,0.08);
+        --border-mid: rgba(255,255,255,0.14);
+        --text: #f0ede8;
+        --muted: #888;
+        --hint: #555;
+        --accent: #f0ede8;
+        --green: #97c459;
+        --green-bg: #1a2e0a;
+        --amber: #ef9f27;
+        --amber-bg: #2a1e08;
+        --blue: #85b7eb;
+        --blue-bg: #0a1e33;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    .app { max-width: 480px; margin: 0 auto; padding: 0 0 80px; }
+
+    /* NAV */
+    .nav { position: sticky; top: 0; z-index: 10; background: var(--bg); border-bottom: 0.5px solid var(--border); }
+    .nav-inner { display: flex; align-items: center; gap: 8px; padding: 12px 16px 0; }
+    .app-title { font-size: 15px; font-weight: 500; flex: 1; }
+    .tabs { display: flex; padding: 0 16px; gap: 2px; margin-top: 8px; }
+    .tab { flex: 1; padding: 8px 4px; font-size: 13px; background: none; border: none; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; font-family: 'DM Sans', sans-serif; transition: color .15s; }
+    .tab.active { color: var(--text); border-bottom-color: var(--text); font-weight: 500; }
+
+    /* CONTENT */
+    .page { display: none; padding: 16px; }
+    .page.active { display: block; }
+
+    /* SECTIONS */
+    .sec-title { font-size: 10px; font-weight: 500; color: var(--hint); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 10px; }
+    .card { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--rad); padding: 16px; margin-bottom: 10px; }
+
+    /* PRESETS */
+    .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+    .preset-btn { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--rad-sm); padding: 10px 12px; text-align: left; cursor: pointer; transition: border-color .15s; font-family: 'DM Sans', sans-serif; }
+    .preset-btn.active { border: 1.5px solid var(--text); }
+    .preset-btn .pn { font-size: 13px; font-weight: 500; color: var(--text); display: block; }
+    .preset-btn .ps { font-size: 11px; color: var(--muted); display: block; margin-top: 2px; }
+
+    /* FORM */
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+    .field { display: flex; flex-direction: column; gap: 4px; }
+    .field label { font-size: 11px; color: var(--muted); }
+    .field input { padding: 9px 11px; border: 0.5px solid var(--border-mid); border-radius: var(--rad-sm); background: var(--card); color: var(--text); font-size: 14px; font-family: 'DM Sans', sans-serif; width: 100%; }
+    .field input:focus { outline: none; border-color: var(--text); }
+
+    /* BUTTONS */
+    .btn-primary { width: 100%; padding: 12px; background: var(--text); color: var(--bg); border: none; border-radius: var(--rad-sm); font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; margin-bottom: 12px; }
+    .btn-secondary { padding: 8px 14px; background: var(--card); border: 0.5px solid var(--border-mid); border-radius: var(--rad-sm); font-size: 13px; cursor: pointer; color: var(--text); font-family: 'DM Sans', sans-serif; }
+    .btn-secondary:hover { background: var(--bg); }
+
+    /* METRICS */
+    .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .metric { background: var(--bg); border-radius: var(--rad-sm); padding: 10px 12px; }
+    .metric .ml { font-size: 11px; color: var(--muted); margin-bottom: 3px; }
+    .metric .mv { font-size: 20px; font-weight: 500; }
+    .metric .mu { font-size: 12px; font-weight: 400; color: var(--muted); }
+
+    /* TIMELINE */
+    .tl-item { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 0.5px solid var(--border); }
+    .tl-item:last-child { border: none; }
+    .tl-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border-mid); flex-shrink: 0; }
+    .tl-dot.now { background: var(--green); }
+    .tl-label { font-size: 13px; color: var(--muted); flex: 1; }
+    .tl-time { font-size: 14px; font-weight: 500; font-family: 'DM Mono', monospace; }
+
+    /* FERMENTATION BARS */
+    .fb-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+    .fb-label { font-size: 11px; color: var(--muted); width: 65px; flex-shrink: 0; }
+    .fb-track { flex: 1; height: 5px; background: var(--bg); border-radius: 3px; overflow: hidden; }
+    .fb-fill { height: 100%; border-radius: 3px; transition: width .4s; }
+    .fb-val { font-size: 11px; color: var(--text); width: 30px; text-align: right; flex-shrink: 0; font-family: 'DM Mono', monospace; }
+
+    /* CHART */
+    .chart-wrap { position: relative; width: 100%; height: 150px; margin-top: 10px; }
+
+    /* SAVE ROW */
+    .save-row { display: flex; gap: 8px; margin-top: 10px; }
+    .save-input { flex: 1; padding: 9px 11px; border: 0.5px solid var(--border-mid); border-radius: var(--rad-sm); background: var(--card); color: var(--text); font-size: 13px; font-family: 'DM Sans', sans-serif; }
+
+    /* SAVED LIST */
+    .saved-item { display: flex; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 0.5px solid var(--border); }
+    .saved-item:last-child { border: none; }
+    .saved-name { font-size: 13px; font-weight: 500; flex: 1; }
+    .saved-meta { font-size: 11px; color: var(--muted); }
+    .saved-del { background: none; border: none; cursor: pointer; color: var(--hint); font-size: 16px; padding: 0 4px; }
+
+    /* TIMER */
+    .timer-display { text-align: center; padding: 2rem 0 1.5rem; }
+    .timer-big { font-size: 52px; font-weight: 500; font-family: 'DM Mono', monospace; letter-spacing: -1px; }
+    .timer-phase { font-size: 14px; color: var(--muted); margin-top: 6px; }
+    .timer-next { font-size: 11px; color: var(--hint); margin-top: 3px; }
+
+    /* MIXER */
+    .flour-card { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--rad); padding: 14px 16px; margin-bottom: 8px; }
+    .flour-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .flour-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .flour-name-lbl { font-size: 14px; font-weight: 500; flex: 1; }
+    .flour-remove { background: none; border: none; cursor: pointer; color: var(--hint); font-size: 18px; line-height: 1; padding: 0; }
+    .slider-row { display: flex; align-items: center; gap: 10px; }
+    .slider-row input[type=range] { flex: 1; accent-color: var(--text); }
+    .slider-val { font-size: 13px; font-weight: 500; min-width: 36px; text-align: right; font-family: 'DM Mono', monospace; }
+    .flour-meta { display: flex; gap: 14px; margin-top: 8px; }
+    .flour-stat { font-size: 11px; color: var(--muted); }
+    .flour-stat span { color: var(--text); font-weight: 500; }
+    .bar-stack { display: flex; height: 7px; border-radius: 4px; overflow: hidden; gap: 1px; margin: 12px 0 6px; }
+    .bar-seg { height: 100%; transition: width .3s; }
+    .bar-legend { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-bottom: 12px; }
+    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
+    .legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+    .add-row { display: flex; gap: 8px; margin-bottom: 16px; }
+    .add-select { flex: 1; padding: 9px 11px; border: 0.5px solid var(--border-mid); border-radius: var(--rad-sm); background: var(--card); color: var(--text); font-size: 13px; font-family: 'DM Sans', sans-serif; }
+    .w-badge { display: inline-block; padding: 3px 10px; border-radius: var(--rad-sm); font-size: 11px; font-weight: 500; margin-bottom: 10px; }
+    .badge-ok { background: var(--green-bg); color: var(--green); }
+    .badge-med { background: var(--amber-bg); color: var(--amber); }
+    .badge-hi { background: var(--blue-bg); color: var(--blue); }
+    .impact-row { font-size: 13px; color: var(--muted); margin-bottom: 5px; }
+    .impact-row strong { color: var(--text); }
+    .use-mix-btn { width: 100%; padding: 11px; background: var(--card); border: 0.5px solid var(--border-mid); border-radius: var(--rad-sm); font-size: 13px; cursor: pointer; color: var(--text); font-family: 'DM Sans', sans-serif; margin-top: 4px; }
+    .use-mix-btn:hover { background: var(--bg); }
+
+    /* EMPTY STATE */
+    .empty { padding: 3rem 0; text-align: center; color: var(--hint); font-size: 13px; }
+
+    /* WARN */
+    .warn { padding: 8px 12px; border-radius: var(--rad-sm); font-size: 12px; margin-bottom: 8px; background: var(--amber-bg); color: var(--amber); }
+
+    /* DIVIDER */
+    .divider { height: 0.5px; background: var(--border); margin: 14px 0; }
+
+    /* INSTALL BANNER */
+    #install-banner { display: none; background: var(--card); border: 0.5px solid var(--border); border-radius: var(--rad); padding: 12px 14px; margin: 16px 16px 0; }
+    .install-row { display: flex; align-items: center; gap: 10px; }
+    .install-text { flex: 1; font-size: 13px; }
+    .install-text strong { display: block; font-size: 14px; margin-bottom: 2px; }
+    .install-text span { color: var(--muted); font-size: 12px; }
+    .install-btn { padding: 8px 14px; background: var(--text); color: var(--bg); border: none; border-radius: var(--rad-sm); font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
+  </style>
+</head>
+<body>
+
+<div id="install-banner">
+  <div class="install-row">
+    <div class="install-text">
+      <strong>Installa l'app</strong>
+      <span>Aggiungila alla schermata home</span>
+    </div>
+    <button class="install-btn" id="install-btn">Installa</button>
+    <button onclick="document.getElementById('install-banner').style.display='none'" style="background:none;border:none;cursor:pointer;color:var(--hint);font-size:18px;padding:0 4px">×</button>
+  </div>
+</div>
+
+<div class="app">
+  <div class="nav">
+    <div class="nav-inner">
+      <span class="app-title">Stasera si mangia</span>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('calc')">Calcola</button>
+      <button class="tab" onclick="switchTab('mixer')">Farine</button>
+      <button class="tab" onclick="switchTab('saved')">Salvati</button>
+      <button class="tab" onclick="switchTab('timer')">Timer</button>
+    </div>
+  </div>
+
+  <!-- CALCOLA -->
+  <div class="page active" id="tab-calc">
+
+    <div style="margin-top:14px" class="sec-title">Preset</div>
+    <div class="preset-grid">
+      <button class="preset-btn active" id="p-napoletana" onclick="loadPreset('napoletana')">
+        <span class="pn">Napoletana</span><span class="ps">Idr 65% · 24h</span>
+      </button>
+      <button class="preset-btn" id="p-teglia" onclick="loadPreset('teglia')">
+        <span class="pn">Teglia romana</span><span class="ps">Idr 80% · 48h</span>
+      </button>
+      <button class="preset-btn" id="p-pinsa" onclick="loadPreset('pinsa')">
+        <span class="pn">Pinsa</span><span class="ps">Idr 75% · 36h</span>
+      </button>
+      <button class="preset-btn" id="p-custom" onclick="loadPreset('custom')">
+        <span class="pn">Personalizzato</span><span class="ps">Modifica libera</span>
+      </button>
+    </div>
+
+    <div id="mix-badge-calc"></div>
+
+    <div class="sec-title">Panetti</div>
+    <div class="row2">
+      <div class="field"><label>Numero panetti</label><input type="number" id="panetti" value="6"></div>
+      <div class="field"><label>Peso singolo (g)</label><input type="number" id="pesoPanetto" value="250"></div>
+    </div>
+
+    <div class="sec-title" style="margin-top:8px">Impasto</div>
+    <div class="row2">
+      <div class="field"><label>Idratazione (%)</label><input type="number" id="idr" value="65"></div>
+      <div class="field"><label>Sale (%)</label><input type="number" id="sale" value="2.5"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Temp. impasto (°C)</label><input type="number" id="Timp" value="22"></div>
+      <div class="field"><label>Temp. ambiente (°C)</label><input type="number" id="tempAmb" value="21"></div>
+    </div>
+
+    <div class="sec-title" style="margin-top:8px">Fermentazione</div>
+    <div class="row2">
+      <div class="field"><label>Ore appretto</label><input type="number" id="apprettoOre" value="3"></div>
+      <div class="field"><label>Ore frigo</label><input type="number" id="frigoOre" value="21"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Temp. frigo (°C)</label><input type="number" id="tempFrigo" value="4"></div>
+      <div class="field"><label>Ora pasto</label><input type="time" id="eatTime" value="20:00"></div>
+    </div>
+
+    <button class="btn-primary" style="margin-top:14px" onclick="calcola()">Calcola impasto</button>
+    <div id="output"></div>
+  </div>
+
+  <!-- MIXER FARINE -->
+  <div class="page" id="tab-mixer">
+    <div style="margin-top:14px" class="sec-title">Mix di farine</div>
+    <div id="flour-cards"></div>
+    <div id="total-warn"></div>
+    <div class="bar-stack" id="bar-stack"></div>
+    <div class="bar-legend" id="bar-legend"></div>
+    <div class="add-row">
+      <select class="add-select" id="flour-select"></select>
+      <button class="btn-secondary" onclick="addFlour()">+ Aggiungi</button>
+    </div>
+    <div class="divider"></div>
+    <div class="sec-title">Proprietà del mix</div>
+    <div class="metrics" id="mix-summary"></div>
+    <div id="mix-w-badge"></div>
+    <div id="mix-impact"></div>
+    <button class="use-mix-btn" id="use-mix-btn" onclick="useMixInCalc()" style="display:none">Usa questo mix nel calcolatore →</button>
+  </div>
+
+  <!-- SALVATI -->
+  <div class="page" id="tab-saved">
+    <div style="margin-top:14px" class="sec-title">Impasti salvati</div>
+    <div class="card" id="saved-list-container"><div class="empty">Nessun impasto salvato</div></div>
+  </div>
+
+  <!-- TIMER -->
+  <div class="page" id="tab-timer">
+    <div id="timer-container"><div class="empty" style="padding-top:3rem">Calcola un impasto per avviare il timer</div></div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// ─── PRESETS ───────────────────────────────────────────────────────────────
+const PRESETS = {
+  napoletana: {idr:65,sale:2.5,Timp:22,tempAmb:21,apprettoOre:3,frigoOre:21,tempFrigo:4,panetti:6,pesoPanetto:250},
+  teglia:     {idr:80,sale:2.2,Timp:20,tempAmb:20,apprettoOre:4,frigoOre:44,tempFrigo:4,panetti:1,pesoPanetto:800},
+  pinsa:      {idr:75,sale:2.0,Timp:21,tempAmb:20,apprettoOre:4,frigoOre:32,tempFrigo:4,panetti:4,pesoPanetto:300},
+  custom: null
+};
+let currentPreset = 'napoletana';
+let timerData = null;
+let timerInterval = null;
+let fermentChart = null;
+let mixData = null; // dati dal mixer
+
+// ─── TAB ───────────────────────────────────────────────────────────────────
+function switchTab(t) {
+  const names = ['calc','mixer','saved','timer'];
+  document.querySelectorAll('.tab').forEach((el,i) => el.classList.toggle('active', names[i]===t));
+  names.forEach(n => {
+    document.getElementById('tab-'+n).classList.toggle('active', n===t);
+  });
+  if(t==='saved') renderSaved();
+  if(t==='timer') renderTimer();
+}
+
+// ─── PRESET ────────────────────────────────────────────────────────────────
+function loadPreset(name) {
+  currentPreset = name;
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('p-'+name).classList.add('active');
+  const p = PRESETS[name];
+  if(!p) return;
+  Object.entries(p).forEach(([k,v]) => { const el=document.getElementById(k); if(el) el.value=v; });
+}
+
+function g(id) { return document.getElementById(id).value; }
+
+// ─── CALCOLA ───────────────────────────────────────────────────────────────
+function calcola() {
+  const panetti=parseInt(g('panetti')), pesoPanetto=parseFloat(g('pesoPanetto'));
+  const idr=parseFloat(g('idr')), sale=parseFloat(g('sale')), Timp=parseFloat(g('Timp'));
+  const Ta=parseFloat(g('tempAmb')), ta=parseFloat(g('apprettoOre'));
+  const tf=parseFloat(g('frigoOre')), Tf=parseFloat(g('tempFrigo'));
+  const eatTime=g('eatTime');
+  if(!panetti||!pesoPanetto||!idr||!sale||!Timp||!Ta||!ta||!tf||!Tf||!eatTime) { alert('Compila tutti i campi'); return; }
+
+  const farina = panetti*pesoPanetto;
+  const F = tf*Math.pow(2,(Tf-20)/10) + ta*Math.pow(2,(Ta-20)/10);
+  const Fcorr = F * (1+(idr-70)*0.01) * (1-(sale-2)*0.2) * Math.pow(2,(Timp-20)/10);
+  const lievito = farina * 0.002 * (8/Fcorr);
+  const acqua = farina*(idr/100);
+  const saleGrammi = farina*(sale/100);
+
+  const [h,m] = eatTime.split(':').map(Number);
+  const eatDate = new Date(); eatDate.setHours(h,m,0,0);
+  const stesura = new Date(eatDate.getTime()-30*60000);
+  const fuoriFrigo = new Date(stesura.getTime()-ta*3600000);
+  const impasto = new Date(fuoriFrigo.getTime()-tf*3600000);
+  timerData = {impasto,fuoriFrigo,stesura,eatDate,tf,ta};
+
+  function fmt(d) { return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0'); }
+  function isNow(d,next) { const n=Date.now(); return n>=d.getTime()&&n<next.getTime(); }
+
+  // Farine nel mix
+  const mixInfo = mixData ? `<div style="font-size:11px;color:var(--muted);margin-bottom:12px">Mix: ${mixData.label}</div>` : '';
+
+  document.getElementById('output').innerHTML = `
+${mixInfo}
+<div class="card">
+  <div class="metrics">
+    <div class="metric"><div class="ml">Farina</div><div class="mv">${farina.toFixed(0)}<span class="mu"> g</span></div></div>
+    <div class="metric"><div class="ml">Acqua</div><div class="mv">${acqua.toFixed(0)}<span class="mu"> g</span></div></div>
+    <div class="metric"><div class="ml">Lievito</div><div class="mv">${lievito.toFixed(2)}<span class="mu"> g</span></div></div>
+    <div class="metric"><div class="ml">Sale</div><div class="mv">${saleGrammi.toFixed(1)}<span class="mu"> g</span></div></div>
+  </div>
+  <div class="divider"></div>
+  <div class="sec-title">Fermentazione corretta: ${Fcorr.toFixed(1)}h</div>
+  <div class="fb-row"><span class="fb-label">Frigo</span><div class="fb-track"><div class="fb-fill" style="width:${Math.min(100,tf/(tf+ta)*100).toFixed(0)}%;background:#378ADD"></div></div><span class="fb-val">${tf}h</span></div>
+  <div class="fb-row"><span class="fb-label">Appretto</span><div class="fb-track"><div class="fb-fill" style="width:${Math.min(100,ta/(tf+ta)*100).toFixed(0)}%;background:#639922"></div></div><span class="fb-val">${ta}h</span></div>
+  <div class="divider"></div>
+  <div class="sec-title">Programma</div>
+  <div class="tl-item"><div class="tl-dot${isNow(impasto,fuoriFrigo)?' now':''}"></div><span class="tl-label">Impasto</span><span class="tl-time">${fmt(impasto)}</span></div>
+  <div class="tl-item"><div class="tl-dot${isNow(fuoriFrigo,stesura)?' now':''}"></div><span class="tl-label">Fuori dal frigo</span><span class="tl-time">${fmt(fuoriFrigo)}</span></div>
+  <div class="tl-item"><div class="tl-dot${isNow(stesura,eatDate)?' now':''}"></div><span class="tl-label">Stesura</span><span class="tl-time">${fmt(stesura)}</span></div>
+  <div class="tl-item"><div class="tl-dot"></div><span class="tl-label">In tavola</span><span class="tl-time">${fmt(eatDate)}</span></div>
+</div>
+<div class="card">
+  <div class="sec-title">Grafico fermentazione</div>
+  <div class="chart-wrap"><canvas id="fermentChart" role="img" aria-label="Grafico attività lievito: ${tf}h frigo poi ${ta}h appretto">Attività lievito nel tempo</canvas></div>
+  <div id="chart-legend" style="display:flex;gap:14px;margin-top:8px;font-size:11px;color:var(--muted)">
+    <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:#378ADD;display:inline-block"></span>Frigo ${tf}h</span>
+    <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:#639922;display:inline-block"></span>Appretto ${ta}h</span>
+  </div>
+</div>
+<div class="save-row">
+  <input class="save-input" id="saveName" placeholder="Nome (es: Napoletana sabato)">
+  <button class="btn-secondary" onclick='saveImpasto(${JSON.stringify({panetti,pesoPanetto,idr,sale,Timp,tempAmb:Ta,apprettoOre:ta,frigoOre:tf,tempFrigo:Tf,eatTime}).replace(/"/g,"&quot;")})'>Salva</button>
+</div>`;
+
+  buildChart(tf,ta,Tf,Ta);
+}
+
+function buildChart(tf,ta,Tf,Ta) {
+  if(fermentChart) fermentChart.destroy();
+  const labels=[], data=[], totalH=tf+ta;
+  for(let i=0;i<=totalH;i++) {
+    labels.push(i+'h');
+    let act = i<=tf ? Math.pow(2,(Tf-20)/10)*i/tf*0.4 : 0.4+0.6*(1-Math.exp(-(i-tf)/(ta*0.4)));
+    data.push(parseFloat((act*100).toFixed(1)));
+  }
+  const ctx = document.getElementById('fermentChart');
+  if(!ctx) return;
+  fermentChart = new Chart(ctx, {
+    type:'line',
+    data:{labels,datasets:[{label:'Attività %',data,borderColor:'#639922',backgroundColor:'rgba(99,153,34,0.07)',borderWidth:1.5,pointRadius:0,fill:true,tension:0.4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{grid:{color:'rgba(128,128,128,0.08)'},ticks:{color:'#888',font:{size:10},maxTicksLimit:8}},
+              y:{grid:{color:'rgba(128,128,128,0.08)'},ticks:{color:'#888',font:{size:10},callback:v=>v+'%'},min:0,max:100}}}
+  });
+}
+
+// ─── SAVE / LOAD ───────────────────────────────────────────────────────────
+function saveImpasto(params) {
+  const name = (document.getElementById('saveName')||{}).value?.trim() || 'Impasto '+new Date().toLocaleDateString('it-IT');
+  const saves = JSON.parse(localStorage.getItem('pizzaSaves')||'[]');
+  saves.unshift({name,params,date:new Date().toLocaleDateString('it-IT'),id:Date.now()});
+  localStorage.setItem('pizzaSaves', JSON.stringify(saves.slice(0,30)));
+  const el = document.getElementById('saveName');
+  if(el) el.value='';
+  alert('Salvato: '+name);
+}
+
+function renderSaved() {
+  const saves = JSON.parse(localStorage.getItem('pizzaSaves')||'[]');
+  const c = document.getElementById('saved-list-container');
+  if(!saves.length) { c.innerHTML='<div class="empty">Nessun impasto salvato</div>'; return; }
+  c.innerHTML = saves.map(s=>`
+<div class="saved-item">
+  <div style="flex:1">
+    <div class="saved-name">${s.name}</div>
+    <div class="saved-meta">${s.date} · Idr ${s.params.idr}% · ${s.params.panetti}×${s.params.pesoPanetto}g</div>
+  </div>
+  <button class="btn-secondary" style="font-size:12px;padding:6px 10px" onclick="loadSaved(${s.id})">Carica</button>
+  <button class="saved-del" onclick="deleteSaved(${s.id})">×</button>
+</div>`).join('');
+}
+
+function loadSaved(id) {
+  const saves = JSON.parse(localStorage.getItem('pizzaSaves')||'[]');
+  const s = saves.find(x=>x.id===id); if(!s) return;
+  Object.entries(s.params).forEach(([k,v])=>{ const el=document.getElementById(k); if(el) el.value=v; });
+  currentPreset='custom';
+  document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('p-custom').classList.add('active');
+  switchTab('calc');
+  setTimeout(calcola,100);
+}
+
+function deleteSaved(id) {
+  let saves = JSON.parse(localStorage.getItem('pizzaSaves')||'[]');
+  saves = saves.filter(x=>x.id!==id);
+  localStorage.setItem('pizzaSaves', JSON.stringify(saves));
+  renderSaved();
+}
+
+// ─── TIMER ─────────────────────────────────────────────────────────────────
+function renderTimer() {
+  const c = document.getElementById('timer-container');
+  if(!timerData) { c.innerHTML='<div class="empty" style="padding-top:3rem">Calcola un impasto per avviare il timer</div>'; return; }
+  function fmt(d) { return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0'); }
+  c.innerHTML=`
+<div class="timer-display">
+  <div class="timer-big" id="timer-big">--:--:--</div>
+  <div class="timer-phase" id="timer-phase">Calcolo...</div>
+  <div class="timer-next" id="timer-next"></div>
+</div>
+<div class="card">
+  <div class="tl-item"><div class="tl-dot" id="dot-imp"></div><span class="tl-label">Impasto</span><span class="tl-time">${fmt(timerData.impasto)}</span></div>
+  <div class="tl-item"><div class="tl-dot" id="dot-fri"></div><span class="tl-label">Fuori dal frigo</span><span class="tl-time">${fmt(timerData.fuoriFrigo)}</span></div>
+  <div class="tl-item"><div class="tl-dot" id="dot-ste"></div><span class="tl-label">Stesura</span><span class="tl-time">${fmt(timerData.stesura)}</span></div>
+  <div class="tl-item"><div class="tl-dot" id="dot-eat"></div><span class="tl-label">In tavola</span><span class="tl-time">${fmt(timerData.eatDate)}</span></div>
+</div>`;
+  if(timerInterval) clearInterval(timerInterval);
+  const phases=[
+    {name:'Inizia l\'impasto', target:timerData.impasto, dot:'dot-imp'},
+    {name:'Togli dal frigo',   target:timerData.fuoriFrigo, dot:'dot-fri'},
+    {name:'Stendi la pizza',   target:timerData.stesura, dot:'dot-ste'},
+    {name:'Buon appetito!',    target:timerData.eatDate, dot:'dot-eat'}
+  ];
+  function tick() {
+    const now=Date.now();
+    phases.forEach((p,i)=>{
+      const el=document.getElementById(p.dot);
+      if(el) el.classList.toggle('now', now>=p.target.getTime());
+    });
+    let next=phases.find(p=>now<p.target.getTime());
+    if(!next) { document.getElementById('timer-big').textContent='00:00:00'; document.getElementById('timer-phase').textContent='Goditi la pizza!'; document.getElementById('timer-next').textContent=''; clearInterval(timerInterval); return; }
+    const diff=next.target.getTime()-now;
+    const hh=Math.floor(diff/3600000), mm=Math.floor((diff%3600000)/60000), ss=Math.floor((diff%60000)/1000);
+    document.getElementById('timer-big').textContent=hh.toString().padStart(2,'0')+':'+mm.toString().padStart(2,'0')+':'+ss.toString().padStart(2,'0');
+    document.getElementById('timer-phase').textContent=next.name;
+    document.getElementById('timer-next').textContent='prossima fase';
+  }
+  tick(); timerInterval=setInterval(tick,1000);
+}
+
+// ─── MIXER FARINE ──────────────────────────────────────────────────────────
+const FLOURS=[
+  {id:'00',    name:'Farina 00',        color:'#B5D4F4', w:[180,380], prot:[9,13],  absorb:[50,60]},
+  {id:'0',     name:'Farina 0',         color:'#C0DD97', w:[150,300], prot:[10,12], absorb:[52,62]},
+  {id:'1',     name:'Farina tipo 1',    color:'#EF9F27', w:[160,280], prot:[11,13], absorb:[55,65]},
+  {id:'integ', name:'Integrale',        color:'#D85A30', w:[100,180], prot:[12,14], absorb:[65,80]},
+  {id:'semola',name:'Semola rimacinata',color:'#FAC775', w:[180,220], prot:[12,13], absorb:[55,65]},
+  {id:'mani',  name:'Manitoba',         color:'#7F77DD', w:[350,420], prot:[14,16], absorb:[62,75]},
+  {id:'farro', name:'Farro',            color:'#9FE1CB', w:[100,150], prot:[11,13], absorb:[60,70]},
+  {id:'mais',  name:'Farina di mais',   color:'#F0997B', w:[0,60],    prot:[7,9],   absorb:[45,55]},
+];
+let activeFl=[{id:'00',perc:70},{id:'mani',perc:30}];
+function midW(f){return Math.round((f.w[0]+f.w[1])/2);}
+function midP(f){return ((f.prot[0]+f.prot[1])/2).toFixed(1);}
+function midA(f){return Math.round((f.absorb[0]+f.absorb[1])/2);}
+function getF(id){return FLOURS.find(f=>f.id===id);}
+
+function renderMixer(){
+  const total=activeFl.reduce((s,a)=>s+a.perc,0);
+  document.getElementById('flour-cards').innerHTML=activeFl.map((a,i)=>{
+    const f=getF(a.id);
+    return `<div class="flour-card">
+<div class="flour-header"><div class="flour-dot" style="background:${f.color}"></div><span class="flour-name-lbl">${f.name}</span>${activeFl.length>1?`<button class="flour-remove" onclick="removeFlour(${i})">×</button>`:''}</div>
+<div class="slider-row"><input type="range" min="5" max="100" step="5" value="${a.perc}" oninput="updateFl(${i},+this.value)"><span class="slider-val">${a.perc}%</span></div>
+<div class="flour-meta"><span class="flour-stat">W <span>${f.w[0]}–${f.w[1]}</span></span><span class="flour-stat">Proteine <span>${f.prot[0]}–${f.prot[1]}%</span></span><span class="flour-stat">Assorbimento <span>${f.absorb[0]}–${f.absorb[1]}%</span></span></div>
+</div>`}).join('');
+  document.getElementById('total-warn').innerHTML=total!==100?`<div class="warn">Totale: ${total}% — deve essere 100%</div>`:'';
+  document.getElementById('bar-stack').innerHTML=activeFl.map(a=>`<div class="bar-seg" style="width:${a.perc}%;background:${getF(a.id).color}"></div>`).join('');
+  document.getElementById('bar-legend').innerHTML=activeFl.map(a=>`<div class="legend-item"><div class="legend-dot" style="background:${getF(a.id).color}"></div>${getF(a.id).name} ${a.perc}%</div>`).join('');
+
+  const sel=document.getElementById('flour-select');
+  const used=activeFl.map(a=>a.id);
+  sel.innerHTML=FLOURS.filter(f=>!used.includes(f.id)).map(f=>`<option value="${f.id}">${f.name}</option>`).join('');
+
+  if(total===100){
+    let wMix=0,pMix=0,aMix=0;
+    activeFl.forEach(a=>{const f=getF(a.id);wMix+=midW(f)*(a.perc/100);pMix+=parseFloat(midP(f))*(a.perc/100);aMix+=midA(f)*(a.perc/100);});
+    wMix=Math.round(wMix); pMix=pMix.toFixed(1); aMix=Math.round(aMix);
+    document.getElementById('mix-summary').innerHTML=`
+<div class="metric"><div class="ml">W medio</div><div class="mv">${wMix}</div></div>
+<div class="metric"><div class="ml">Proteine</div><div class="mv">${pMix}<span class="mu"> %</span></div></div>
+<div class="metric"><div class="ml">Assorbimento</div><div class="mv">${aMix}<span class="mu"> %</span></div></div>
+<div class="metric"><div class="ml">Farine usate</div><div class="mv">${activeFl.length}</div></div>`;
+    let wLabel,wClass,wDesc,oreMin,oreMax;
+    if(wMix<200){wLabel='W basso';wClass='badge-med';wDesc='Lievitazioni brevi, impasto friabile';oreMin=6;oreMax=12;}
+    else if(wMix<280){wLabel='W medio';wClass='badge-ok';wDesc='Versatile, ideale napoletana classica';oreMin=12;oreMax=24;}
+    else{wLabel='W alto';wClass='badge-hi';wDesc='Perfetto per lunghe lievitazioni';oreMin=24;oreMax=72;}
+    const idrMin=aMix-5;
+    document.getElementById('mix-w-badge').innerHTML=`<span class="w-badge ${wClass}">${wLabel}</span>`;
+    document.getElementById('mix-impact').innerHTML=`
+<div class="impact-row">${wDesc}</div>
+<div class="impact-row">Idratazione consigliata: <strong>${idrMin}–${aMix}%</strong></div>
+<div class="impact-row" style="margin-bottom:12px">Lievitazione consigliata: <strong>${oreMin}–${oreMax}h</strong></div>`;
+    document.getElementById('use-mix-btn').style.display='block';
+    mixData={wMix,pMix,aMix,idrSugg:Math.round((idrMin+aMix)/2),label:activeFl.map(a=>getF(a.id).name+'&nbsp;'+a.perc+'%').join(', ')};
+  } else {
+    document.getElementById('mix-summary').innerHTML='';
+    document.getElementById('mix-w-badge').innerHTML='';
+    document.getElementById('mix-impact').innerHTML='<span style="font-size:13px;color:var(--hint)">Porta il totale a 100% per vedere le proprietà</span>';
+    document.getElementById('use-mix-btn').style.display='none';
+    mixData=null;
+  }
+}
+
+function updateFl(i,val){activeFl[i].perc=val;renderMixer();}
+function addFlour(){const id=document.getElementById('flour-select').value;if(!id||activeFl.find(a=>a.id===id))return;activeFl.push({id,perc:10});renderMixer();}
+function removeFlour(i){activeFl.splice(i,1);renderMixer();}
+function useMixInCalc(){
+  if(!mixData) return;
+  document.getElementById('idr').value=mixData.idrSugg;
+  document.getElementById('mix-badge-calc').innerHTML=`<div style="font-size:11px;color:var(--muted);margin-bottom:10px;padding:8px 12px;background:var(--green-bg);color:var(--green);border-radius:var(--rad-sm)">Mix farine attivo · W${mixData.wMix} · Idr consigliata ${mixData.idrSugg}%</div>`;
+  switchTab('calc');
+}
+
+// ─── PWA INSTALL ───────────────────────────────────────────────────────────
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('install-banner').style.display='block';
+});
+document.getElementById('install-btn').addEventListener('click', async () => {
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const {outcome} = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('install-banner').style.display='none';
+});
+window.addEventListener('appinstalled', () => { document.getElementById('install-banner').style.display='none'; });
+
+// ─── SERVICE WORKER ────────────────────────────────────────────────────────
+if('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────────────
+loadPreset('napoletana');
+renderMixer();
+</script>
+</body>
+</html>
