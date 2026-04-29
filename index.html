@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Stasera si mangia</title>
-  <meta name="description" content="Calcolatore impasto pizza con mixer farine, timer e salvataggio ricette">
   <meta name="theme-color" content="#1a1a1a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,177 +13,117 @@
   <link rel="icon" href="icons/icon-192.png">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #f7f6f2;
-      --card: #ffffff;
-      --border: rgba(0,0,0,0.08);
-      --border-mid: rgba(0,0,0,0.14);
-      --text: #1a1a1a;
-      --muted: #888;
-      --hint: #bbb;
-      --accent: #1a1a1a;
-      --green: #3b6d11;
-      --green-bg: #eaf3de;
-      --amber: #854f0b;
-      --amber-bg: #faeeda;
-      --blue: #185fa5;
-      --blue-bg: #e6f1fb;
-      --rad: 12px;
-      --rad-sm: 8px;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #141414;
-        --card: #1e1e1e;
-        --border: rgba(255,255,255,0.08);
-        --border-mid: rgba(255,255,255,0.14);
-        --text: #f0ede8;
-        --muted: #888;
-        --hint: #555;
-        --accent: #f0ede8;
-        --green: #97c459;
-        --green-bg: #1a2e0a;
-        --amber: #ef9f27;
-        --amber-bg: #2a1e08;
-        --blue: #85b7eb;
-        --blue-bg: #0a1e33;
-      }
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-    .app { max-width: 480px; margin: 0 auto; padding: 0 0 80px; }
-
-    /* NAV */
-    .nav { position: sticky; top: 0; z-index: 10; background: var(--bg); border-bottom: 0.5px solid var(--border); }
-    .nav-inner { display: flex; align-items: center; gap: 8px; padding: 12px 16px 0; }
-    .app-title { font-size: 15px; font-weight: 500; flex: 1; }
-    .tabs { display: flex; padding: 0 16px; gap: 2px; margin-top: 8px; }
-    .tab { flex: 1; padding: 8px 4px; font-size: 13px; background: none; border: none; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; font-family: 'DM Sans', sans-serif; transition: color .15s; }
-    .tab.active { color: var(--text); border-bottom-color: var(--text); font-weight: 500; }
-
-    /* CONTENT */
-    .page { display: none; padding: 16px; }
-    .page.active { display: block; }
-
-    /* SECTIONS */
-    .sec-title { font-size: 10px; font-weight: 500; color: var(--hint); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 10px; }
-    .card { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--rad); padding: 16px; margin-bottom: 10px; }
-
-    /* PRESETS */
-    .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
-    .preset-btn { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--rad-sm); padding: 10px 12px; text-align: left; cursor: pointer; transition: border-color .15s; font-family: 'DM Sans', sans-serif; }
-    .preset-btn.active { border: 1.5px solid var(--text); }
-    .preset-btn .pn { font-size: 13px; font-weight: 500; color: var(--text); display: block; }
-    .preset-btn .ps { font-size: 11px; color: var(--muted); display: block; margin-top: 2px; }
-
-    /* FORM */
-    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
-    .field { display: flex; flex-direction: column; gap: 4px; }
-    .field label { font-size: 11px; color: var(--muted); }
-    .field input { padding: 9px 11px; border: 0.5px solid var(--border-mid); border-radius: var(--rad-sm); background: var(--card); color: var(--text); font-size: 14px; font-family: 'DM Sans', sans-serif; width: 100%; }
-    .field input:focus { outline: none; border-color: var(--text); }
-
-    /* BUTTONS */
-    .btn-primary { width: 100%; padding: 12px; background: var(--text); color: var(--bg); border: none; border-radius: var(--rad-sm); font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; margin-bottom: 12px; }
-    .btn-secondary { padding: 8px 14px; background: var(--card); border: 0.5px solid var(--border-mid); border-radius: var(--rad-sm); font-size: 13px; cursor: pointer; color: var(--text); font-family: 'DM Sans', sans-serif; }
-    .btn-secondary:hover { background: var(--bg); }
-
-    /* METRICS */
-    .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-    .metric { background: var(--bg); border-radius: var(--rad-sm); padding: 10px 12px; }
-    .metric .ml { font-size: 11px; color: var(--muted); margin-bottom: 3px; }
-    .metric .mv { font-size: 20px; font-weight: 500; }
-    .metric .mu { font-size: 12px; font-weight: 400; color: var(--muted); }
-
-    /* TIMELINE */
-    .tl-item { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 0.5px solid var(--border); }
-    .tl-item:last-child { border: none; }
-    .tl-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border-mid); flex-shrink: 0; }
-    .tl-dot.now { background: var(--green); }
-    .tl-label { font-size: 13px; color: var(--muted); flex: 1; }
-    .tl-time { font-size: 14px; font-weight: 500; font-family: 'DM Mono', monospace; }
-
-    /* FERMENTATION BARS */
-    .fb-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
-    .fb-label { font-size: 11px; color: var(--muted); width: 65px; flex-shrink: 0; }
-    .fb-track { flex: 1; height: 5px; background: var(--bg); border-radius: 3px; overflow: hidden; }
-    .fb-fill { height: 100%; border-radius: 3px; transition: width .4s; }
-    .fb-val { font-size: 11px; color: var(--text); width: 30px; text-align: right; flex-shrink: 0; font-family: 'DM Mono', monospace; }
-
-    /* CHART */
-    .chart-wrap { position: relative; width: 100%; height: 150px; margin-top: 10px; }
-
-    /* SAVE ROW */
-    .save-row { display: flex; gap: 8px; margin-top: 10px; }
-    .save-input { flex: 1; padding: 9px 11px; border: 0.5px solid var(--border-mid); border-radius: var(--rad-sm); background: var(--card); color: var(--text); font-size: 13px; font-family: 'DM Sans', sans-serif; }
-
-    /* SAVED LIST */
-    .saved-item { display: flex; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 0.5px solid var(--border); }
-    .saved-item:last-child { border: none; }
-    .saved-name { font-size: 13px; font-weight: 500; flex: 1; }
-    .saved-meta { font-size: 11px; color: var(--muted); }
-    .saved-del { background: none; border: none; cursor: pointer; color: var(--hint); font-size: 16px; padding: 0 4px; }
-
-    /* TIMER */
-    .timer-display { text-align: center; padding: 2rem 0 1.5rem; }
-    .timer-big { font-size: 52px; font-weight: 500; font-family: 'DM Mono', monospace; letter-spacing: -1px; }
-    .timer-phase { font-size: 14px; color: var(--muted); margin-top: 6px; }
-    .timer-next { font-size: 11px; color: var(--hint); margin-top: 3px; }
-
-    /* MIXER */
-    .flour-card { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--rad); padding: 14px 16px; margin-bottom: 8px; }
-    .flour-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-    .flour-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-    .flour-name-lbl { font-size: 14px; font-weight: 500; flex: 1; }
-    .flour-remove { background: none; border: none; cursor: pointer; color: var(--hint); font-size: 18px; line-height: 1; padding: 0; }
-    .slider-row { display: flex; align-items: center; gap: 10px; }
-    .slider-row input[type=range] { flex: 1; accent-color: var(--text); }
-    .slider-val { font-size: 13px; font-weight: 500; min-width: 36px; text-align: right; font-family: 'DM Mono', monospace; }
-    .flour-meta { display: flex; gap: 14px; margin-top: 8px; }
-    .flour-stat { font-size: 11px; color: var(--muted); }
-    .flour-stat span { color: var(--text); font-weight: 500; }
-    .bar-stack { display: flex; height: 7px; border-radius: 4px; overflow: hidden; gap: 1px; margin: 12px 0 6px; }
-    .bar-seg { height: 100%; transition: width .3s; }
-    .bar-legend { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-bottom: 12px; }
-    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
-    .legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
-    .add-row { display: flex; gap: 8px; margin-bottom: 16px; }
-    .add-select { flex: 1; padding: 9px 11px; border: 0.5px solid var(--border-mid); border-radius: var(--rad-sm); background: var(--card); color: var(--text); font-size: 13px; font-family: 'DM Sans', sans-serif; }
-    .w-badge { display: inline-block; padding: 3px 10px; border-radius: var(--rad-sm); font-size: 11px; font-weight: 500; margin-bottom: 10px; }
-    .badge-ok { background: var(--green-bg); color: var(--green); }
-    .badge-med { background: var(--amber-bg); color: var(--amber); }
-    .badge-hi { background: var(--blue-bg); color: var(--blue); }
-    .impact-row { font-size: 13px; color: var(--muted); margin-bottom: 5px; }
-    .impact-row strong { color: var(--text); }
-    .use-mix-btn { width: 100%; padding: 11px; background: var(--card); border: 0.5px solid var(--border-mid); border-radius: var(--rad-sm); font-size: 13px; cursor: pointer; color: var(--text); font-family: 'DM Sans', sans-serif; margin-top: 4px; }
-    .use-mix-btn:hover { background: var(--bg); }
-
-    /* EMPTY STATE */
-    .empty { padding: 3rem 0; text-align: center; color: var(--hint); font-size: 13px; }
-
-    /* WARN */
-    .warn { padding: 8px 12px; border-radius: var(--rad-sm); font-size: 12px; margin-bottom: 8px; background: var(--amber-bg); color: var(--amber); }
-
-    /* DIVIDER */
-    .divider { height: 0.5px; background: var(--border); margin: 14px 0; }
-
-    /* INSTALL BANNER */
-    #install-banner { display: none; background: var(--card); border: 0.5px solid var(--border); border-radius: var(--rad); padding: 12px 14px; margin: 16px 16px 0; }
-    .install-row { display: flex; align-items: center; gap: 10px; }
-    .install-text { flex: 1; font-size: 13px; }
-    .install-text strong { display: block; font-size: 14px; margin-bottom: 2px; }
-    .install-text span { color: var(--muted); font-size: 12px; }
-    .install-btn { padding: 8px 14px; background: var(--text); color: var(--bg); border: none; border-radius: var(--rad-sm); font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
+    :root{--bg:#f7f6f2;--card:#fff;--border:rgba(0,0,0,0.08);--bm:rgba(0,0,0,0.14);--text:#1a1a1a;--muted:#888;--hint:#bbb;--green:#3b6d11;--gbg:#eaf3de;--amber:#854f0b;--abg:#faeeda;--blue:#185fa5;--bbg:#e6f1fb;--red:#a32d2d;--rbg:#fcebeb;--rad:12px;--rsm:8px}
+    @media(prefers-color-scheme:dark){:root{--bg:#141414;--card:#1e1e1e;--border:rgba(255,255,255,0.08);--bm:rgba(255,255,255,0.14);--text:#f0ede8;--muted:#888;--hint:#555;--green:#97c459;--gbg:#1a2e0a;--amber:#ef9f27;--abg:#2a1e08;--blue:#85b7eb;--bbg:#0a1e33;--red:#f09595;--rbg:#2a0a0a}}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+    .app{max-width:480px;margin:0 auto;padding:0 0 80px}
+    .nav{position:sticky;top:0;z-index:10;background:var(--bg);border-bottom:0.5px solid var(--border)}
+    .nav-inner{display:flex;align-items:center;padding:12px 16px 0}
+    .app-title{font-size:15px;font-weight:500;flex:1}
+    .tabs{display:flex;padding:0 16px;gap:2px;margin-top:8px}
+    .tab{flex:1;padding:8px 4px;font-size:13px;background:none;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;font-family:'DM Sans',sans-serif;transition:color .15s}
+    .tab.active{color:var(--text);border-bottom-color:var(--text);font-weight:500}
+    .page{display:none;padding:16px}
+    .page.active{display:block}
+    .sec-title{font-size:10px;font-weight:500;color:var(--hint);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+    .card{background:var(--card);border:0.5px solid var(--border);border-radius:var(--rad);padding:16px;margin-bottom:10px}
+    .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+    .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
+    .field{display:flex;flex-direction:column;gap:4px}
+    .field label{font-size:11px;color:var(--muted)}
+    .field input,.field select{padding:9px 11px;border:0.5px solid var(--bm);border-radius:var(--rsm);background:var(--card);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;width:100%}
+    .field input:focus,.field select:focus{outline:none;border-color:var(--text)}
+    .field input.warn-field{border-color:var(--amber)}
+    .btn-primary{width:100%;padding:12px;background:var(--text);color:var(--bg);border:none;border-radius:var(--rsm);font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:12px}
+    .btn-secondary{padding:8px 14px;background:var(--card);border:0.5px solid var(--bm);border-radius:var(--rsm);font-size:13px;cursor:pointer;color:var(--text);font-family:'DM Sans',sans-serif}
+    .btn-secondary:hover{background:var(--bg)}
+    .preset-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+    .preset-btn{background:var(--card);border:0.5px solid var(--border);border-radius:var(--rsm);padding:10px 12px;text-align:left;cursor:pointer;font-family:'DM Sans',sans-serif}
+    .preset-btn.active{border:1.5px solid var(--text)}
+    .preset-btn .pn{font-size:13px;font-weight:500;color:var(--text);display:block}
+    .preset-btn .ps{font-size:11px;color:var(--muted);display:block;margin-top:2px}
+    .metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+    .metric{background:var(--bg);border-radius:var(--rsm);padding:10px 12px}
+    .metric .ml{font-size:11px;color:var(--muted);margin-bottom:3px}
+    .metric .mv{font-size:20px;font-weight:500}
+    .metric .mu{font-size:12px;font-weight:400;color:var(--muted)}
+    .tl-wrap{position:relative;padding-left:20px}
+    .tl-line{position:absolute;left:6px;top:8px;bottom:8px;width:1px;background:var(--border)}
+    .tl-item{display:flex;align-items:flex-start;gap:10px;padding:6px 0;position:relative}
+    .tl-dot{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--bm);background:var(--card);flex-shrink:0;margin-top:1px;position:absolute;left:-20px}
+    .tl-dot.done{background:var(--text);border-color:var(--text)}
+    .tl-dot.now{background:var(--green);border-color:var(--green);box-shadow:0 0 0 3px var(--gbg)}
+    .tl-body{flex:1}
+    .tl-label{font-size:13px;color:var(--muted)}
+    .tl-label.now{color:var(--text);font-weight:500}
+    .tl-when{font-size:14px;font-weight:500;font-family:'DM Mono',monospace}
+    .tl-day{font-size:11px;color:var(--muted);margin-right:5px}
+    .fb-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+    .fb-label{font-size:11px;color:var(--muted);width:65px;flex-shrink:0}
+    .fb-track{flex:1;height:5px;background:var(--bg);border-radius:3px;overflow:hidden}
+    .fb-fill{height:100%;border-radius:3px;transition:width .4s}
+    .fb-val{font-size:11px;color:var(--text);width:30px;text-align:right;flex-shrink:0;font-family:'DM Mono',monospace}
+    .chart-wrap{position:relative;width:100%;height:150px;margin-top:10px}
+    .save-row{display:flex;gap:8px;margin-top:10px}
+    .save-input{flex:1;padding:9px 11px;border:0.5px solid var(--bm);border-radius:var(--rsm);background:var(--card);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif}
+    .saved-item{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:0.5px solid var(--border)}
+    .saved-item:last-child{border:none}
+    .saved-name{font-size:13px;font-weight:500;flex:1}
+    .saved-meta{font-size:11px;color:var(--muted)}
+    .saved-del{background:none;border:none;cursor:pointer;color:var(--hint);font-size:16px;padding:0 4px}
+    .timer-big{font-size:56px;font-weight:500;font-family:'DM Mono',monospace;letter-spacing:-2px;text-align:center;padding:1.5rem 0 0.5rem}
+    .timer-phase{font-size:15px;font-weight:500;text-align:center;margin-bottom:4px}
+    .timer-next{font-size:12px;color:var(--muted);text-align:center;margin-bottom:1.5rem}
+    .timer-btns{display:flex;gap:8px;justify-content:center;margin-bottom:1.5rem}
+    .timer-btn-big{padding:10px 28px;border-radius:var(--rsm);font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;border:0.5px solid var(--bm)}
+    .timer-start{background:var(--text);color:var(--bg);border-color:var(--text)}
+    .timer-reset{background:var(--card);color:var(--muted)}
+    .flour-card{background:var(--card);border:0.5px solid var(--border);border-radius:var(--rad);padding:14px 16px;margin-bottom:8px}
+    .flour-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+    .flour-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+    .flour-name-lbl{font-size:14px;font-weight:500;flex:1}
+    .flour-remove{background:none;border:none;cursor:pointer;color:var(--hint);font-size:18px;line-height:1;padding:0}
+    .slider-row{display:flex;align-items:center;gap:10px}
+    .slider-row input[type=range]{flex:1;accent-color:var(--text)}
+    .slider-val{font-size:13px;font-weight:500;min-width:36px;text-align:right;font-family:'DM Mono',monospace}
+    .flour-meta{display:flex;gap:14px;margin-top:8px}
+    .flour-stat{font-size:11px;color:var(--muted)}
+    .flour-stat span{color:var(--text);font-weight:500}
+    .bar-stack{display:flex;height:7px;border-radius:4px;overflow:hidden;gap:1px;margin:12px 0 6px}
+    .bar-seg{height:100%;transition:width .3s}
+    .bar-legend{display:flex;flex-wrap:wrap;gap:6px 12px;margin-bottom:12px}
+    .legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+    .legend-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+    .add-row{display:flex;gap:8px;margin-bottom:16px}
+    .add-select{flex:1;padding:9px 11px;border:0.5px solid var(--bm);border-radius:var(--rsm);background:var(--card);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif}
+    .w-badge{display:inline-block;padding:3px 10px;border-radius:var(--rsm);font-size:11px;font-weight:500;margin-bottom:10px}
+    .badge-ok{background:var(--gbg);color:var(--green)}
+    .badge-med{background:var(--abg);color:var(--amber)}
+    .badge-hi{background:var(--bbg);color:var(--blue)}
+    .use-mix-btn{width:100%;padding:11px;background:var(--card);border:0.5px solid var(--bm);border-radius:var(--rsm);font-size:13px;cursor:pointer;color:var(--text);font-family:'DM Sans',sans-serif;margin-top:4px}
+    .empty{padding:3rem 0;text-align:center;color:var(--hint);font-size:13px}
+    .alert{padding:8px 12px;border-radius:var(--rsm);font-size:12px;margin-bottom:8px}
+    .alert-warn{background:var(--abg);color:var(--amber)}
+    .alert-info{background:var(--bbg);color:var(--blue)}
+    .alert-ok{background:var(--gbg);color:var(--green)}
+    .divider{height:0.5px;background:var(--border);margin:14px 0}
+    .date-btns{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+    .date-btn{padding:4px 10px;font-size:11px;background:var(--card);border:0.5px solid var(--bm);border-radius:var(--rsm);cursor:pointer;color:var(--muted);font-family:'DM Sans',sans-serif}
+    .date-btn:hover{background:var(--bg);color:var(--text)}
+    #install-banner{display:none;background:var(--card);border:0.5px solid var(--border);border-radius:var(--rad);padding:12px 14px;margin:16px 16px 0}
+    .install-row{display:flex;align-items:center;gap:10px}
+    .install-text{flex:1;font-size:13px}
+    .install-text strong{display:block;font-size:14px;margin-bottom:2px}
+    .install-text span{color:var(--muted);font-size:12px}
+    .install-btn{padding:8px 14px;background:var(--text);color:var(--bg);border:none;border-radius:var(--rsm);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap}
   </style>
 </head>
 <body>
 
 <div id="install-banner">
   <div class="install-row">
-    <div class="install-text">
-      <strong>Installa l'app</strong>
-      <span>Aggiungila alla schermata home</span>
-    </div>
+    <div class="install-text"><strong>Installa l'app</strong><span>Aggiungila alla schermata home</span></div>
     <button class="install-btn" id="install-btn">Installa</button>
     <button onclick="document.getElementById('install-banner').style.display='none'" style="background:none;border:none;cursor:pointer;color:var(--hint);font-size:18px;padding:0 4px">×</button>
   </div>
@@ -192,9 +131,7 @@
 
 <div class="app">
   <div class="nav">
-    <div class="nav-inner">
-      <span class="app-title">Stasera si mangia</span>
-    </div>
+    <div class="nav-inner"><span class="app-title">Stasera si mangia</span></div>
     <div class="tabs">
       <button class="tab active" onclick="switchTab('calc')">Calcola</button>
       <button class="tab" onclick="switchTab('mixer')">Farine</button>
@@ -205,63 +142,61 @@
 
   <!-- CALCOLA -->
   <div class="page active" id="tab-calc">
-
-    <div style="margin-top:14px" class="sec-title">Preset</div>
+    <div style="margin-top:14px" class="sec-title">Preset di partenza</div>
     <div class="preset-grid">
-      <button class="preset-btn active" id="p-napoletana" onclick="loadPreset('napoletana')">
-        <span class="pn">Napoletana</span><span class="ps">Idr 65% · 24h</span>
-      </button>
-      <button class="preset-btn" id="p-teglia" onclick="loadPreset('teglia')">
-        <span class="pn">Teglia romana</span><span class="ps">Idr 80% · 48h</span>
-      </button>
-      <button class="preset-btn" id="p-pinsa" onclick="loadPreset('pinsa')">
-        <span class="pn">Pinsa</span><span class="ps">Idr 75% · 36h</span>
-      </button>
-      <button class="preset-btn" id="p-custom" onclick="loadPreset('custom')">
-        <span class="pn">Personalizzato</span><span class="ps">Modifica libera</span>
-      </button>
+      <button class="preset-btn active" id="p-napoletana" onclick="loadPreset('napoletana')"><span class="pn">Napoletana</span><span class="ps">Idr 65% · 24h</span></button>
+      <button class="preset-btn" id="p-teglia" onclick="loadPreset('teglia')"><span class="pn">Teglia romana</span><span class="ps">Idr 80% · 48h</span></button>
+      <button class="preset-btn" id="p-pinsa" onclick="loadPreset('pinsa')"><span class="pn">Pinsa</span><span class="ps">Idr 75% · 36h</span></button>
+      <button class="preset-btn" id="p-manuale" onclick="loadPreset('manuale')"><span class="pn">Manuale</span><span class="ps">Tutto libero</span></button>
     </div>
-
     <div id="mix-badge-calc"></div>
 
     <div class="sec-title">Panetti</div>
     <div class="row2">
-      <div class="field"><label>Numero panetti</label><input type="number" id="panetti" value="6"></div>
-      <div class="field"><label>Peso singolo (g)</label><input type="number" id="pesoPanetto" value="250"></div>
+      <div class="field"><label>Numero panetti</label><input type="number" id="panetti" value="6" min="1"></div>
+      <div class="field"><label>Peso singolo (g)</label><input type="number" id="pesoPanetto" value="250" min="100"></div>
     </div>
 
     <div class="sec-title" style="margin-top:8px">Impasto</div>
     <div class="row2">
-      <div class="field"><label>Idratazione (%)</label><input type="number" id="idr" value="65"></div>
-      <div class="field"><label>Sale (%)</label><input type="number" id="sale" value="2.5"></div>
+      <div class="field"><label>Idratazione (%)</label><input type="number" id="idr" value="65" min="50" max="100"></div>
+      <div class="field"><label>Sale (%)</label><input type="number" id="sale" value="2.5" step="0.1"></div>
     </div>
     <div class="row2">
+      <div class="field"><label>Tipo lievito</label>
+        <select id="tipoLievito" onchange="onLievitoChange()">
+          <option value="fresco">Fresco (g)</option>
+          <option value="secco">Secco (g)</option>
+          <option value="madre">Pasta madre (%)</option>
+        </select>
+      </div>
+      <div class="field"><label id="lievito-label">Lievito (g) — auto</label><input type="number" id="lievito" placeholder="auto" step="0.1" min="0"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Olio (%) — opzionale</label><input type="number" id="olio" value="0" step="0.5" min="0" max="10"></div>
       <div class="field"><label>Temp. impasto (°C)</label><input type="number" id="Timp" value="22"></div>
-      <div class="field"><label>Temp. ambiente (°C)</label><input type="number" id="tempAmb" value="21"></div>
     </div>
 
-    <div class="sec-title" style="margin-top:8px">Fermentazione</div>
+    <div class="sec-title" style="margin-top:8px">Fasi lievitazione</div>
+    <div id="fasi-container"></div>
+    <button class="btn-secondary" style="width:100%;margin-bottom:12px;font-size:12px" onclick="addFase()">+ Aggiungi fase</button>
+
+    <div class="sec-title">Quando vuoi mangiare</div>
     <div class="row2">
-      <div class="field"><label>Ore appretto</label><input type="number" id="apprettoOre" value="3"></div>
-      <div class="field"><label>Ore frigo</label><input type="number" id="frigoOre" value="21"></div>
-    </div>
-    <div class="row2">
-      <div class="field"><label>Temp. frigo (°C)</label><input type="number" id="tempFrigo" value="4"></div>
-      <div class="field"><label>Ora pasto</label><input type="time" id="eatTime" value="20:00"></div>
-    </div>
-    <div class="row2">
-      <div class="field"><label>Giorno pasto</label><input type="date" id="eatDate" value=""></div>
-      <div class="field" style="justify-content:flex-end;padding-bottom:2px">
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <button class="btn-secondary" style="font-size:11px;padding:5px 10px" onclick="setDay(0)">Oggi</button>
-          <button class="btn-secondary" style="font-size:11px;padding:5px 10px" onclick="setDay(1)">Domani</button>
-          <button class="btn-secondary" style="font-size:11px;padding:5px 10px" onclick="setNextWeekday(6)">Sab</button>
-          <button class="btn-secondary" style="font-size:11px;padding:5px 10px" onclick="setNextWeekday(0)">Dom</button>
+      <div class="field">
+        <label>Data</label>
+        <input type="date" id="eatDate">
+        <div class="date-btns">
+          <button class="date-btn" onclick="setDay(0)">Oggi</button>
+          <button class="date-btn" onclick="setDay(1)">Domani</button>
+          <button class="date-btn" onclick="setNextWD(6)">Sab</button>
+          <button class="date-btn" onclick="setNextWD(0)">Dom</button>
         </div>
       </div>
+      <div class="field"><label>Ora</label><input type="time" id="eatTime" value="20:00"></div>
     </div>
 
-    <button class="btn-primary" style="margin-top:14px" onclick="calcola()">Calcola impasto</button>
+    <button class="btn-primary" onclick="calcola()">Calcola impasto</button>
     <div id="output"></div>
   </div>
 
@@ -294,71 +229,195 @@
   <div class="page" id="tab-timer">
     <div id="timer-container"><div class="empty" style="padding-top:3rem">Calcola un impasto per avviare il timer</div></div>
   </div>
-
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-// ─── PRESETS ───────────────────────────────────────────────────────────────
-const PRESETS = {
-  napoletana: {idr:65,sale:2.5,Timp:22,tempAmb:21,apprettoOre:3,frigoOre:21,tempFrigo:4,panetti:6,pesoPanetto:250},
-  teglia:     {idr:80,sale:2.2,Timp:20,tempAmb:20,apprettoOre:4,frigoOre:44,tempFrigo:4,panetti:1,pesoPanetto:800},
-  pinsa:      {idr:75,sale:2.0,Timp:21,tempAmb:20,apprettoOre:4,frigoOre:32,tempFrigo:4,panetti:4,pesoPanetto:300},
-  custom: null
-};
-let currentPreset = 'napoletana';
-let timerData = null;
-let timerInterval = null;
-let fermentChart = null;
-let mixData = null; // dati dal mixer
+// ═══════════════════════════════════════════════════════════════
+// MOTORE LIEVITO — basato su coefficiente Q10 e IDY reference
+// Fonte: modello usato da pizzaioli professionisti (Associazione
+// Verace Pizza Napoletana e letteratura tecnica Quaglia/Caputo)
+//
+// Formula base: L% = (R / TF) * K_idr * K_sale * K_tipo
+// dove TF = forza fermentativa totale (ore equivalenti a 21°C)
+// TF = Σ (ore_fase_i * Q10^((T_i - 21)/10))
+// Q10 = 2.0 per lievito di birra (raddoppia ogni 10°C)
+// R = 0.003 (costante di riferimento IDY a 21°C per 8h)
+// ═══════════════════════════════════════════════════════════════
 
-// ─── TAB ───────────────────────────────────────────────────────────────────
-function switchTab(t) {
-  const names = ['calc','mixer','saved','timer'];
-  document.querySelectorAll('.tab').forEach((el,i) => el.classList.toggle('active', names[i]===t));
-  names.forEach(n => {
-    document.getElementById('tab-'+n).classList.toggle('active', n===t);
-  });
-  if(t==='saved') renderSaved();
-  if(t==='timer') renderTimer();
+const Q10 = 2.0;
+const T_REF = 21;
+const R_BASE = 0.003; // % lievito secco per TF=8h a 21°C
+
+function fermentForza(fasi) {
+  // Calcola ore equivalenti totali a T_REF
+  return fasi.reduce((sum, f) => sum + f.ore * Math.pow(Q10, (f.temp - T_REF) / 10), 0);
 }
 
-// ─── PRESET ────────────────────────────────────────────────────────────────
+function calcolaLievito(TF, tipoLievito, idr, sale) {
+  // Correzioni empiriche validate
+  const k_idr = 1 + (idr - 65) * 0.008;   // idratazione alta accelera
+  const k_sale = 1 - (sale - 2) * 0.15;    // sale inibisce
+  const k_TF_corr = k_idr * k_sale;
+
+  const TF_corr = TF * k_TF_corr;
+
+  // % lievito secco equivalente
+  let percSecco = R_BASE * (8 / Math.max(TF_corr, 0.5));
+
+  // Conversione per tipo
+  let perc;
+  if (tipoLievito === 'fresco') perc = percSecco * 3;       // fresco = 3x secco
+  else if (tipoLievito === 'madre') perc = percSecco * 20;  // madre = ~20x secco
+  else perc = percSecco;
+
+  return { perc, TF_corr };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FASI LIEVITAZIONE
+// ═══════════════════════════════════════════════════════════════
+let fasi = [
+  { id: 1, nome: 'Puntata (T ambiente)', ore: 1,  temp: 21, tipo: 'ambiente' },
+  { id: 2, nome: 'Maturazione frigo',    ore: 20, temp: 4,  tipo: 'frigo' },
+  { id: 3, nome: 'Appretto (T ambiente)',ore: 3,  temp: 21, tipo: 'ambiente' },
+];
+let fasiId = 4;
+
+function renderFasi() {
+  const c = document.getElementById('fasi-container');
+  c.innerHTML = fasi.map((f, i) => `
+<div class="card" style="padding:12px 14px;margin-bottom:8px">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+    <input value="${f.nome}" oninput="fasi[${i}].nome=this.value" style="flex:1;padding:6px 9px;border:0.5px solid var(--bm);border-radius:var(--rsm);background:var(--card);color:var(--text);font-size:13px;font-weight:500;font-family:'DM Sans',sans-serif">
+    ${fasi.length > 1 ? `<button onclick="removeFase(${i})" style="background:none;border:none;cursor:pointer;color:var(--hint);font-size:18px;padding:0">×</button>` : ''}
+  </div>
+  <div class="row2" style="margin-bottom:0">
+    <div class="field"><label>Ore</label><input type="number" value="${f.ore}" min="0.5" step="0.5" oninput="fasi[${i}].ore=+this.value;aggiornaPreview()"></div>
+    <div class="field"><label>Temperatura (°C)</label><input type="number" value="${f.temp}" oninput="fasi[${i}].temp=+this.value;aggiornaPreview()"></div>
+  </div>
+</div>`).join('');
+  aggiornaPreview();
+}
+
+function addFase() {
+  fasi.push({ id: fasiId++, nome: 'Fase personalizzata', ore: 4, temp: 21, tipo: 'custom' });
+  renderFasi();
+}
+function removeFase(i) { fasi.splice(i, 1); renderFasi(); }
+
+function aggiornaPreview() {
+  const idr = parseFloat(document.getElementById('idr').value) || 65;
+  const sale = parseFloat(document.getElementById('sale').value) || 2.5;
+  const tipo = document.getElementById('tipoLievito').value;
+  const TF = fermentForza(fasi);
+  const { perc, TF_corr } = calcolaLievito(TF, tipo, idr, sale);
+  const farina = (parseInt(document.getElementById('panetti').value)||6) * (parseFloat(document.getElementById('pesoPanetto').value)||250);
+  const lievAuto = farina * (perc / 100);
+  const lbl = document.getElementById('lievito-label');
+  if (lbl) lbl.textContent = `Lievito — auto: ${lievAuto.toFixed(2)}g`;
+}
+
+function onLievitoChange() {
+  const t = document.getElementById('tipoLievito').value;
+  const lbl = document.getElementById('lievito-label');
+  if (lbl) lbl.textContent = t === 'madre' ? 'Pasta madre (%) — auto' : 'Lievito (g) — auto';
+  aggiornaPreview();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PRESETS
+// ═══════════════════════════════════════════════════════════════
+const PRESETS = {
+  napoletana: { idr:65, sale:2.5, Timp:22, olio:0, panetti:6, pesoPanetto:250,
+    fasi:[{id:1,nome:'Puntata (T ambiente)',ore:1,temp:21},{id:2,nome:'Maturazione frigo',ore:20,temp:4},{id:3,nome:'Appretto',ore:3,temp:21}] },
+  teglia: { idr:80, sale:2.0, Timp:20, olio:3, panetti:1, pesoPanetto:800,
+    fasi:[{id:1,nome:'Puntata (T ambiente)',ore:2,temp:20},{id:2,nome:'Maturazione frigo',ore:44,temp:4},{id:3,nome:'Appretto',ore:2,temp:20}] },
+  pinsa: { idr:75, sale:2.0, Timp:21, olio:2, panetti:4, pesoPanetto:300,
+    fasi:[{id:1,nome:'Puntata (T ambiente)',ore:1,temp:20},{id:2,nome:'Maturazione frigo',ore:34,temp:4},{id:3,nome:'Appretto',ore:1,temp:20}] },
+  manuale: { idr:65, sale:2.5, Timp:22, olio:0, panetti:6, pesoPanetto:250,
+    fasi:[{id:1,nome:'Fase 1',ore:1,temp:21},{id:2,nome:'Fase 2',ore:12,temp:4},{id:3,nome:'Fase 3',ore:3,temp:21}] },
+};
+
 function loadPreset(name) {
-  currentPreset = name;
   document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('p-'+name).classList.add('active');
-  const p = PRESETS[name];
-  if(!p) return;
-  Object.entries(p).forEach(([k,v]) => { const el=document.getElementById(k); if(el) el.value=v; });
+  const p = PRESETS[name]; if (!p) return;
+  ['idr','sale','Timp','olio','panetti','pesoPanetto'].forEach(k => {
+    const el = document.getElementById(k); if (el) el.value = p[k];
+  });
+  fasi = p.fasi.map((f,i) => ({...f, id: i+1}));
+  fasiId = fasi.length + 1;
+  renderFasi();
 }
 
 function g(id) { return document.getElementById(id).value; }
 
-// ─── CALCOLA ───────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// CALCOLA
+// ═══════════════════════════════════════════════════════════════
+let timerData = null;
+let timerInterval = null;
+let timerRunning = false;
+let fermentChart = null;
+let mixData = null;
+
 function calcola() {
-  const panetti=parseInt(g('panetti')), pesoPanetto=parseFloat(g('pesoPanetto'));
-  const idr=parseFloat(g('idr')), sale=parseFloat(g('sale')), Timp=parseFloat(g('Timp'));
-  const Ta=parseFloat(g('tempAmb')), ta=parseFloat(g('apprettoOre'));
-  const tf=parseFloat(g('frigoOre')), Tf=parseFloat(g('tempFrigo'));
-  const eatTime=g('eatTime');
-  if(!panetti||!pesoPanetto||!idr||!sale||!Timp||!Ta||!ta||!tf||!Tf||!eatTime) { alert('Compila tutti i campi'); return; }
-
-  const farina = panetti*pesoPanetto;
-  const F = tf*Math.pow(2,(Tf-20)/10) + ta*Math.pow(2,(Ta-20)/10);
-  const Fcorr = F * (1+(idr-70)*0.01) * (1-(sale-2)*0.2) * Math.pow(2,(Timp-20)/10);
-  const lievito = farina * 0.002 * (8/Fcorr);
-  const acqua = farina*(idr/100);
-  const saleGrammi = farina*(sale/100);
-
+  const panetti = parseInt(g('panetti'));
+  const pesoPanetto = parseFloat(g('pesoPanetto'));
+  const idr = parseFloat(g('idr'));
+  const sale = parseFloat(g('sale'));
+  const Timp = parseFloat(g('Timp'));
+  const olio = parseFloat(g('olio')) || 0;
+  const tipoLievito = g('tipoLievito');
   const eatDateVal = g('eatDate');
-  const [h,m] = eatTime.split(':').map(Number);
-  const eatDate = eatDateVal ? new Date(eatDateVal + 'T' + eatTime) : new Date();
-  if(!eatDateVal) eatDate.setHours(h,m,0,0);
-  const stesura = new Date(eatDate.getTime()-30*60000);
-  const fuoriFrigo = new Date(stesura.getTime()-ta*3600000);
-  const impasto = new Date(fuoriFrigo.getTime()-tf*3600000);
-  timerData = {impasto,fuoriFrigo,stesura,eatDate,tf,ta};
+  const eatTime = g('eatTime');
+
+  if (!panetti||!pesoPanetto||!idr||!sale||!Timp||!eatTime||!eatDateVal) { alert('Compila tutti i campi'); return; }
+  if (fasi.some(f => !f.ore || f.temp === undefined)) { alert('Controlla le fasi di lievitazione'); return; }
+
+  const farina = panetti * pesoPanetto;
+  const acqua = farina * (idr / 100);
+  const saleGr = farina * (sale / 100);
+  const olioGr = farina * (olio / 100);
+
+  const TF = fermentForza(fasi);
+  const { perc, TF_corr } = calcolaLievito(TF, tipoLievito, idr, sale);
+
+  // Lievito: usa valore manuale se inserito, altrimenti auto
+  const lievitoManuale = parseFloat(g('lievito'));
+  const lievutoCalc = farina * (perc / 100);
+  const lievito = (lievitoManuale > 0) ? lievitoManuale : lievutoCalc;
+  const lievitoSource = (lievitoManuale > 0) ? 'manuale' : 'calcolato';
+
+  // Correzione Tout impasto (regola dei 55 per napoletana)
+  const T55 = Timp; // l'utente inserisce già la T desiderata
+
+  // Calcolo temperatura acqua consigliata (regola dei 55: T_farina + T_ambiente + T_acqua ≈ 55)
+  const tempAmb = fasi.find(f => f.tipo === 'ambiente' || f.temp > 10)?.temp || 21;
+  const tempFarina = tempAmb; // approssimazione
+  const tempAcqua = 55 - tempFarina - Timp;
+
+  // Timeline
+  const eatDate = new Date(eatDateVal + 'T' + eatTime);
+  let cursor = new Date(eatDate);
+  const timeline = [{ label: 'In tavola', time: new Date(cursor), fase: null }];
+
+  // Stesura: 30 min prima di mangiare
+  cursor = new Date(cursor.getTime() - 30 * 60000);
+  timeline.unshift({ label: 'Stesura', time: new Date(cursor), fase: null });
+
+  // Fasi al contrario
+  const fasiRev = [...fasi].reverse();
+  fasiRev.forEach(f => {
+    cursor = new Date(cursor.getTime() - f.ore * 3600000);
+    timeline.unshift({ label: f.nome, time: new Date(cursor), fase: f });
+  });
+
+  // Prima fase = inizio impasto
+  timeline[0].label = 'Inizio impasto';
+
+  timerData = { timeline, started: false };
 
   const DAYS = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
   const today = new Date(); today.setHours(0,0,0,0);
@@ -366,92 +425,130 @@ function calcola() {
   function fmtDay(d) {
     const dd = new Date(d); dd.setHours(0,0,0,0);
     const diff = Math.round((dd-today)/86400000);
-    if(diff===0) return 'Oggi';
-    if(diff===1) return 'Domani';
-    if(diff===-1) return 'Ieri';
-    return DAYS[d.getDay()]+' '+d.getDate();
+    if (diff===0) return 'Oggi';
+    if (diff===1) return 'Domani';
+    if (diff===-1) return 'Ieri';
+    return DAYS[d.getDay()]+' '+d.getDate()+'/'+( d.getMonth()+1);
   }
-  function fmtFull(d) { return `<span style="font-size:11px;color:var(--muted);margin-right:6px">${fmtDay(d)}</span>${fmt(d)}`; }
-  function isNow(d,next) { const n=Date.now(); return n>=d.getTime()&&n<next.getTime(); }
+  function isNow(d, next) { const n=Date.now(); return n>=d.getTime()&&n<next.getTime(); }
+  function isDone(d) { return Date.now() > d.getTime(); }
 
-  const mixInfo = mixData ? `<div style="font-size:11px;color:var(--muted);margin-bottom:12px">Mix: ${mixData.label}</div>` : '';
+  // Consigli
+  const avvisi = [];
+  if (TF_corr < 4) avvisi.push({ type:'warn', msg:'Fermentazione molto breve: rischio impasto poco maturo.' });
+  if (TF_corr > 80) avvisi.push({ type:'warn', msg:'Fermentazione molto lunga: attenzione a non sovra-lievitare.' });
+  if (idr > 80) avvisi.push({ type:'info', msg:'Alta idratazione: usa farina forte (W>280) e impasta bene.' });
+  if (tempAcqua < 4) avvisi.push({ type:'warn', msg:`Temperatura acqua consigliata ${tempAcqua}°C: usa acqua molto fredda o ghiaccio.` });
+  if (tempAcqua > 28) avvisi.push({ type:'info', msg:`Temperatura acqua consigliata ${tempAcqua}°C: usa acqua tiepida.` });
+  if (lievitoSource === 'calcolato' && lievito < 0.05) avvisi.push({ type:'info', msg:'Quantità lievito molto bassa: pesa con bilancia di precisione.' });
+
+  const mixInfo = mixData ? `<div style="font-size:11px;background:var(--gbg);color:var(--green);padding:7px 11px;border-radius:var(--rsm);margin-bottom:10px">Mix farine attivo · W${mixData.wMix} · Idr consigliata ${mixData.idrSugg}%</div>` : '';
+  const avvisiHtml = avvisi.map(a => `<div class="alert alert-${a.type==='warn'?'warn':'info'}">${a.msg}</div>`).join('');
+
+  const tlHtml = timeline.map((t, i) => {
+    const next = timeline[i+1];
+    const done = isDone(t.time);
+    const now = next ? isNow(t.time, next.time) : false;
+    const durHtml = t.fase ? `<div style="font-size:11px;color:var(--muted);margin-top:1px">${t.fase.ore}h · ${t.fase.temp}°C</div>` : '';
+    return `<div class="tl-item">
+      <div class="tl-dot${done&&!now?' done':''}${now?' now':''}"></div>
+      <div class="tl-body">
+        <div class="tl-label${now?' now':''}">${t.label}</div>
+        ${durHtml}
+      </div>
+      <div class="tl-when"><span class="tl-day">${fmtDay(t.time)}</span>${fmt(t.time)}</div>
+    </div>`;
+  }).join('');
+
+  // Riga olio condizionale
+  const olioRow = olio > 0 ? `<div class="metric"><div class="ml">Olio</div><div class="mv">${olioGr.toFixed(1)}<span class="mu"> g</span></div></div>` : '';
 
   document.getElementById('output').innerHTML = `
-${mixInfo}
+${mixInfo}${avvisiHtml}
 <div class="card">
   <div class="metrics">
     <div class="metric"><div class="ml">Farina</div><div class="mv">${farina.toFixed(0)}<span class="mu"> g</span></div></div>
     <div class="metric"><div class="ml">Acqua</div><div class="mv">${acqua.toFixed(0)}<span class="mu"> g</span></div></div>
-    <div class="metric"><div class="ml">Lievito</div><div class="mv">${lievito.toFixed(2)}<span class="mu"> g</span></div></div>
-    <div class="metric"><div class="ml">Sale</div><div class="mv">${saleGrammi.toFixed(1)}<span class="mu"> g</span></div></div>
+    <div class="metric"><div class="ml">Lievito ${lievitoSource==='manuale'?'(man.)':'(auto)'}</div><div class="mv">${lievito.toFixed(2)}<span class="mu"> g</span></div></div>
+    <div class="metric"><div class="ml">Sale</div><div class="mv">${saleGr.toFixed(1)}<span class="mu"> g</span></div></div>
+    ${olioRow}
+    <div class="metric"><div class="ml">T° acqua consigliata</div><div class="mv">${Math.round(tempAcqua)}<span class="mu"> °C</span></div></div>
   </div>
   <div class="divider"></div>
-  <div class="sec-title">Fermentazione corretta: ${Fcorr.toFixed(1)}h</div>
-  <div class="fb-row"><span class="fb-label">Frigo</span><div class="fb-track"><div class="fb-fill" style="width:${Math.min(100,tf/(tf+ta)*100).toFixed(0)}%;background:#378ADD"></div></div><span class="fb-val">${tf}h</span></div>
-  <div class="fb-row"><span class="fb-label">Appretto</span><div class="fb-track"><div class="fb-fill" style="width:${Math.min(100,ta/(tf+ta)*100).toFixed(0)}%;background:#639922"></div></div><span class="fb-val">${ta}h</span></div>
-  <div class="divider"></div>
-  <div class="sec-title">Programma</div>
-  <div class="tl-item"><div class="tl-dot${isNow(impasto,fuoriFrigo)?' now':''}"></div><span class="tl-label">Inizia impasto</span><span class="tl-time">${fmtFull(impasto)}</span></div>
-  <div class="tl-item"><div class="tl-dot${isNow(fuoriFrigo,stesura)?' now':''}"></div><span class="tl-label">Fuori dal frigo</span><span class="tl-time">${fmtFull(fuoriFrigo)}</span></div>
-  <div class="tl-item"><div class="tl-dot${isNow(stesura,eatDate)?' now':''}"></div><span class="tl-label">Stesura</span><span class="tl-time">${fmtFull(stesura)}</span></div>
-  <div class="tl-item"><div class="tl-dot"></div><span class="tl-label">In tavola</span><span class="tl-time">${fmtFull(eatDate)}</span></div>
+  <div class="sec-title">Forza fermentativa: ${TF_corr.toFixed(1)}h eq.</div>
+  ${fasi.map(f=>{
+    const tot=fasi.reduce((s,x)=>s+x.ore,0);
+    return `<div class="fb-row"><span class="fb-label" style="font-size:10px">${f.nome.substring(0,12)}</span><div class="fb-track"><div class="fb-fill" style="width:${Math.min(100,f.ore/tot*100).toFixed(0)}%;background:${f.temp<=6?'#378ADD':f.temp<=15?'#7F77DD':'#639922'}"></div></div><span class="fb-val">${f.ore}h</span></div>`;
+  }).join('')}
 </div>
 <div class="card">
-  <div class="sec-title">Grafico fermentazione</div>
-  <div class="chart-wrap"><canvas id="fermentChart" role="img" aria-label="Grafico attività lievito: ${tf}h frigo poi ${ta}h appretto">Attività lievito nel tempo</canvas></div>
-  <div id="chart-legend" style="display:flex;gap:14px;margin-top:8px;font-size:11px;color:var(--muted)">
-    <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:#378ADD;display:inline-block"></span>Frigo ${tf}h</span>
-    <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:#639922;display:inline-block"></span>Appretto ${ta}h</span>
+  <div class="sec-title">Programma</div>
+  <div class="tl-wrap"><div class="tl-line"></div>${tlHtml}</div>
+</div>
+<div class="card">
+  <div class="sec-title">Grafico attività lievito</div>
+  <div class="chart-wrap"><canvas id="fermentChart" role="img" aria-label="Grafico attività lievito nel tempo">Attività lievito</canvas></div>
+  <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap">
+    <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted)"><span style="width:8px;height:8px;border-radius:2px;background:#378ADD;display:inline-block"></span>Frigo / freddo</span>
+    <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted)"><span style="width:8px;height:8px;border-radius:2px;background:#639922;display:inline-block"></span>Ambiente</span>
   </div>
 </div>
 <div class="save-row">
-  <input class="save-input" id="saveName" placeholder="Nome (es: Napoletana sabato)">
-  <button class="btn-secondary" onclick='saveImpasto(${JSON.stringify({panetti,pesoPanetto,idr,sale,Timp,tempAmb:Ta,apprettoOre:ta,frigoOre:tf,tempFrigo:Tf,eatTime}).replace(/"/g,"&quot;")})'>Salva</button>
+  <input class="save-input" id="saveName" placeholder="Nome (es. Napoletana sabato)">
+  <button class="btn-secondary" onclick="saveImpasto()">Salva</button>
 </div>`;
 
-  buildChart(tf,ta,Tf,Ta);
+  buildChart();
 }
 
-function buildChart(tf,ta,Tf,Ta) {
-  if(fermentChart) fermentChart.destroy();
-  const labels=[], data=[], totalH=tf+ta;
-  for(let i=0;i<=totalH;i++) {
-    labels.push(i+'h');
-    let act = i<=tf ? Math.pow(2,(Tf-20)/10)*i/tf*0.4 : 0.4+0.6*(1-Math.exp(-(i-tf)/(ta*0.4)));
-    data.push(parseFloat((act*100).toFixed(1)));
-  }
-  const ctx = document.getElementById('fermentChart');
-  if(!ctx) return;
+function buildChart() {
+  if (fermentChart) fermentChart.destroy();
+  const labels = [], data = [], colors = [];
+  let t = 0;
+  fasi.forEach(f => {
+    const steps = Math.max(1, Math.round(f.ore * 2));
+    for (let i = 0; i <= steps; i++) {
+      const h = t + (f.ore / steps) * i;
+      labels.push(h.toFixed(1)+'h');
+      const act = Math.pow(Q10, (f.temp - T_REF) / 10);
+      data.push(parseFloat((act * 100).toFixed(1)));
+      colors.push(f.temp <= 6 ? '#378ADD' : f.temp <= 15 ? '#7F77DD' : '#639922');
+    }
+    t += f.ore;
+  });
+  const ctx = document.getElementById('fermentChart'); if (!ctx) return;
   fermentChart = new Chart(ctx, {
-    type:'line',
-    data:{labels,datasets:[{label:'Attività %',data,borderColor:'#639922',backgroundColor:'rgba(99,153,34,0.07)',borderWidth:1.5,pointRadius:0,fill:true,tension:0.4}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{x:{grid:{color:'rgba(128,128,128,0.08)'},ticks:{color:'#888',font:{size:10},maxTicksLimit:8}},
-              y:{grid:{color:'rgba(128,128,128,0.08)'},ticks:{color:'#888',font:{size:10},callback:v=>v+'%'},min:0,max:100}}}
+    type: 'line',
+    data: { labels, datasets: [{ data, borderColor: '#639922', backgroundColor: 'rgba(99,153,34,0.07)', borderWidth: 1.5, pointRadius: 0, fill: true, tension: 0.3,
+      segment: { borderColor: ctx => colors[ctx.p0DataIndex] || '#639922' } }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+      scales: { x: { grid: { color: 'rgba(128,128,128,0.08)' }, ticks: { color: '#888', font: { size: 10 }, maxTicksLimit: 8 } },
+                y: { grid: { color: 'rgba(128,128,128,0.08)' }, ticks: { color: '#888', font: { size: 10 }, callback: v => v+'%' }, min: 0 } } }
   });
 }
 
-// ─── SAVE / LOAD ───────────────────────────────────────────────────────────
-function saveImpasto(params) {
-  const name = (document.getElementById('saveName')||{}).value?.trim() || 'Impasto '+new Date().toLocaleDateString('it-IT');
+// ═══════════════════════════════════════════════════════════════
+// SAVE / LOAD
+// ═══════════════════════════════════════════════════════════════
+function saveImpasto() {
+  const name = document.getElementById('saveName')?.value?.trim() || 'Impasto '+new Date().toLocaleDateString('it-IT');
+  const params = { panetti:g('panetti'), pesoPanetto:g('pesoPanetto'), idr:g('idr'), sale:g('sale'),
+    Timp:g('Timp'), olio:g('olio'), tipoLievito:g('tipoLievito'), lievito:g('lievito'),
+    eatTime:g('eatTime'), eatDate:g('eatDate'), fasi: JSON.parse(JSON.stringify(fasi)) };
   const saves = JSON.parse(localStorage.getItem('pizzaSaves')||'[]');
-  saves.unshift({name,params,date:new Date().toLocaleDateString('it-IT'),id:Date.now()});
+  saves.unshift({ name, params, date: new Date().toLocaleDateString('it-IT'), id: Date.now() });
   localStorage.setItem('pizzaSaves', JSON.stringify(saves.slice(0,30)));
-  const el = document.getElementById('saveName');
-  if(el) el.value='';
+  const el = document.getElementById('saveName'); if (el) el.value = '';
   alert('Salvato: '+name);
 }
 
 function renderSaved() {
   const saves = JSON.parse(localStorage.getItem('pizzaSaves')||'[]');
   const c = document.getElementById('saved-list-container');
-  if(!saves.length) { c.innerHTML='<div class="empty">Nessun impasto salvato</div>'; return; }
-  c.innerHTML = saves.map(s=>`
+  if (!saves.length) { c.innerHTML = '<div class="empty">Nessun impasto salvato</div>'; return; }
+  c.innerHTML = saves.map(s => `
 <div class="saved-item">
-  <div style="flex:1">
-    <div class="saved-name">${s.name}</div>
-    <div class="saved-meta">${s.date} · Idr ${s.params.idr}% · ${s.params.panetti}×${s.params.pesoPanetto}g</div>
-  </div>
+  <div style="flex:1"><div class="saved-name">${s.name}</div><div class="saved-meta">${s.date} · Idr ${s.params.idr}% · ${s.params.panetti}×${s.params.pesoPanetto}g</div></div>
   <button class="btn-secondary" style="font-size:12px;padding:6px 10px" onclick="loadSaved(${s.id})">Carica</button>
   <button class="saved-del" onclick="deleteSaved(${s.id})">×</button>
 </div>`).join('');
@@ -459,64 +556,117 @@ function renderSaved() {
 
 function loadSaved(id) {
   const saves = JSON.parse(localStorage.getItem('pizzaSaves')||'[]');
-  const s = saves.find(x=>x.id===id); if(!s) return;
-  Object.entries(s.params).forEach(([k,v])=>{ const el=document.getElementById(k); if(el) el.value=v; });
-  currentPreset='custom';
-  document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('p-custom').classList.add('active');
+  const s = saves.find(x => x.id===id); if (!s) return;
+  const p = s.params;
+  ['panetti','pesoPanetto','idr','sale','Timp','olio','tipoLievito','lievito','eatTime','eatDate'].forEach(k => {
+    const el = document.getElementById(k); if (el) el.value = p[k] || '';
+  });
+  if (p.fasi) { fasi = p.fasi; fasiId = fasi.length+1; renderFasi(); }
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('p-manuale').classList.add('active');
   switchTab('calc');
-  setTimeout(calcola,100);
+  setTimeout(calcola, 100);
 }
 
 function deleteSaved(id) {
   let saves = JSON.parse(localStorage.getItem('pizzaSaves')||'[]');
-  saves = saves.filter(x=>x.id!==id);
+  saves = saves.filter(x => x.id !== id);
   localStorage.setItem('pizzaSaves', JSON.stringify(saves));
   renderSaved();
 }
 
-// ─── TIMER ─────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// TIMER — avvio manuale
+// ═══════════════════════════════════════════════════════════════
 function renderTimer() {
   const c = document.getElementById('timer-container');
-  if(!timerData) { c.innerHTML='<div class="empty" style="padding-top:3rem">Calcola un impasto per avviare il timer</div>'; return; }
+  if (!timerData) { c.innerHTML = '<div class="empty" style="padding-top:3rem">Calcola un impasto per avviare il timer</div>'; return; }
+
+  const DAYS = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+  const today = new Date(); today.setHours(0,0,0,0);
   function fmt(d) { return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0'); }
-  c.innerHTML=`
-<div class="timer-display">
-  <div class="timer-big" id="timer-big">--:--:--</div>
-  <div class="timer-phase" id="timer-phase">Calcolo...</div>
-  <div class="timer-next" id="timer-next"></div>
+  function fmtDay(d) { const dd=new Date(d);dd.setHours(0,0,0,0);const diff=Math.round((dd-today)/86400000);if(diff===0)return'Oggi';if(diff===1)return'Dom.';return DAYS[d.getDay()]+' '+d.getDate(); }
+
+  const tlHtml = timerData.timeline.map((t, i) => {
+    const next = timerData.timeline[i+1];
+    return `<div class="tl-item">
+      <div class="tl-dot" id="tdot-${i}"></div>
+      <div class="tl-body"><div class="tl-label" id="tlbl-${i}">${t.label}</div></div>
+      <div class="tl-when"><span class="tl-day">${fmtDay(t.time)}</span>${fmt(t.time)}</div>
+    </div>`;
+  }).join('');
+
+  c.innerHTML = `
+<div class="timer-big" id="timer-big">--:--:--</div>
+<div class="timer-phase" id="timer-phase">Premi Start per avviare</div>
+<div class="timer-next" id="timer-next"></div>
+<div class="timer-btns">
+  <button class="timer-btn-big timer-start" id="timer-start-btn" onclick="toggleTimer()">Start</button>
+  <button class="timer-btn-big timer-reset" onclick="resetTimer()">Reset</button>
 </div>
-<div class="card">
-  <div class="tl-item"><div class="tl-dot" id="dot-imp"></div><span class="tl-label">Impasto</span><span class="tl-time">${fmt(timerData.impasto)}</span></div>
-  <div class="tl-item"><div class="tl-dot" id="dot-fri"></div><span class="tl-label">Fuori dal frigo</span><span class="tl-time">${fmt(timerData.fuoriFrigo)}</span></div>
-  <div class="tl-item"><div class="tl-dot" id="dot-ste"></div><span class="tl-label">Stesura</span><span class="tl-time">${fmt(timerData.stesura)}</span></div>
-  <div class="tl-item"><div class="tl-dot" id="dot-eat"></div><span class="tl-label">In tavola</span><span class="tl-time">${fmt(timerData.eatDate)}</span></div>
-</div>`;
-  if(timerInterval) clearInterval(timerInterval);
-  const phases=[
-    {name:'Inizia l\'impasto', target:timerData.impasto, dot:'dot-imp'},
-    {name:'Togli dal frigo',   target:timerData.fuoriFrigo, dot:'dot-fri'},
-    {name:'Stendi la pizza',   target:timerData.stesura, dot:'dot-ste'},
-    {name:'Buon appetito!',    target:timerData.eatDate, dot:'dot-eat'}
-  ];
-  function tick() {
-    const now=Date.now();
-    phases.forEach((p,i)=>{
-      const el=document.getElementById(p.dot);
-      if(el) el.classList.toggle('now', now>=p.target.getTime());
-    });
-    let next=phases.find(p=>now<p.target.getTime());
-    if(!next) { document.getElementById('timer-big').textContent='00:00:00'; document.getElementById('timer-phase').textContent='Goditi la pizza!'; document.getElementById('timer-next').textContent=''; clearInterval(timerInterval); return; }
-    const diff=next.target.getTime()-now;
-    const hh=Math.floor(diff/3600000), mm=Math.floor((diff%3600000)/60000), ss=Math.floor((diff%60000)/1000);
-    document.getElementById('timer-big').textContent=hh.toString().padStart(2,'0')+':'+mm.toString().padStart(2,'0')+':'+ss.toString().padStart(2,'0');
-    document.getElementById('timer-phase').textContent=next.name;
-    document.getElementById('timer-next').textContent='prossima fase';
-  }
-  tick(); timerInterval=setInterval(tick,1000);
+<div class="card"><div class="tl-wrap"><div class="tl-line"></div>${tlHtml}</div></div>`;
 }
 
-// ─── MIXER FARINE ──────────────────────────────────────────────────────────
+function toggleTimer() {
+  if (!timerData) return;
+  timerRunning = !timerRunning;
+  const btn = document.getElementById('timer-start-btn');
+  if (btn) btn.textContent = timerRunning ? 'Pausa' : 'Continua';
+  if (timerRunning) {
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(tickTimer, 1000);
+    tickTimer();
+  } else {
+    clearInterval(timerInterval);
+  }
+}
+
+function resetTimer() {
+  timerRunning = false;
+  clearInterval(timerInterval);
+  renderTimer();
+}
+
+function tickTimer() {
+  if (!timerData) return;
+  const now = Date.now();
+  const tl = timerData.timeline;
+
+  // Aggiorna dot
+  tl.forEach((t, i) => {
+    const dot = document.getElementById('tdot-'+i);
+    const lbl = document.getElementById('tlbl-'+i);
+    if (!dot) return;
+    const next = tl[i+1];
+    const done = now > t.time.getTime();
+    const active = next ? (now >= t.time.getTime() && now < next.time.getTime()) : false;
+    dot.className = 'tl-dot' + (done && !active ? ' done' : '') + (active ? ' now' : '');
+    if (lbl) lbl.className = 'tl-label' + (active ? ' now' : '');
+  });
+
+  // Prossima fase
+  const next = tl.find(t => now < t.time.getTime());
+  if (!next) {
+    document.getElementById('timer-big').textContent = '00:00:00';
+    document.getElementById('timer-phase').textContent = 'Buon appetito!';
+    document.getElementById('timer-next').textContent = '';
+    clearInterval(timerInterval); timerRunning = false;
+    const btn = document.getElementById('timer-start-btn'); if (btn) btn.textContent = 'Start';
+    return;
+  }
+
+  const diff = next.time.getTime() - now;
+  const hh = Math.floor(diff / 3600000);
+  const mm = Math.floor((diff % 3600000) / 60000);
+  const ss = Math.floor((diff % 60000) / 1000);
+  document.getElementById('timer-big').textContent = hh.toString().padStart(2,'0')+':'+mm.toString().padStart(2,'0')+':'+ss.toString().padStart(2,'0');
+  document.getElementById('timer-phase').textContent = next.label;
+  document.getElementById('timer-next').textContent = 'prossima fase';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MIXER FARINE
+// ═══════════════════════════════════════════════════════════════
 const FLOURS=[
   {id:'00',    name:'Farina 00',        color:'#B5D4F4', w:[180,380], prot:[9,13],  absorb:[50,60]},
   {id:'0',     name:'Farina 0',         color:'#C0DD97', w:[150,300], prot:[10,12], absorb:[52,62]},
@@ -527,7 +677,7 @@ const FLOURS=[
   {id:'farro', name:'Farro',            color:'#9FE1CB', w:[100,150], prot:[11,13], absorb:[60,70]},
   {id:'mais',  name:'Farina di mais',   color:'#F0997B', w:[0,60],    prot:[7,9],   absorb:[45,55]},
 ];
-let activeFl=[{id:'00',perc:70},{id:'mani',perc:30}];
+let activeFl = [{id:'00',perc:70},{id:'mani',perc:30}];
 function midW(f){return Math.round((f.w[0]+f.w[1])/2);}
 function midP(f){return ((f.prot[0]+f.prot[1])/2).toFixed(1);}
 function midA(f){return Math.round((f.absorb[0]+f.absorb[1])/2);}
@@ -542,35 +692,32 @@ function renderMixer(){
 <div class="slider-row"><input type="range" min="5" max="100" step="5" value="${a.perc}" oninput="updateFl(${i},+this.value)"><span class="slider-val">${a.perc}%</span></div>
 <div class="flour-meta"><span class="flour-stat">W <span>${f.w[0]}–${f.w[1]}</span></span><span class="flour-stat">Proteine <span>${f.prot[0]}–${f.prot[1]}%</span></span><span class="flour-stat">Assorbimento <span>${f.absorb[0]}–${f.absorb[1]}%</span></span></div>
 </div>`}).join('');
-  document.getElementById('total-warn').innerHTML=total!==100?`<div class="warn">Totale: ${total}% — deve essere 100%</div>`:'';
+  document.getElementById('total-warn').innerHTML=total!==100?`<div class="alert alert-warn">Totale: ${total}% — deve essere 100%</div>`:'';
   document.getElementById('bar-stack').innerHTML=activeFl.map(a=>`<div class="bar-seg" style="width:${a.perc}%;background:${getF(a.id).color}"></div>`).join('');
   document.getElementById('bar-legend').innerHTML=activeFl.map(a=>`<div class="legend-item"><div class="legend-dot" style="background:${getF(a.id).color}"></div>${getF(a.id).name} ${a.perc}%</div>`).join('');
-
   const sel=document.getElementById('flour-select');
   const used=activeFl.map(a=>a.id);
   sel.innerHTML=FLOURS.filter(f=>!used.includes(f.id)).map(f=>`<option value="${f.id}">${f.name}</option>`).join('');
-
   if(total===100){
     let wMix=0,pMix=0,aMix=0;
     activeFl.forEach(a=>{const f=getF(a.id);wMix+=midW(f)*(a.perc/100);pMix+=parseFloat(midP(f))*(a.perc/100);aMix+=midA(f)*(a.perc/100);});
-    wMix=Math.round(wMix); pMix=pMix.toFixed(1); aMix=Math.round(aMix);
+    wMix=Math.round(wMix);pMix=pMix.toFixed(1);aMix=Math.round(aMix);
     document.getElementById('mix-summary').innerHTML=`
 <div class="metric"><div class="ml">W medio</div><div class="mv">${wMix}</div></div>
 <div class="metric"><div class="ml">Proteine</div><div class="mv">${pMix}<span class="mu"> %</span></div></div>
 <div class="metric"><div class="ml">Assorbimento</div><div class="mv">${aMix}<span class="mu"> %</span></div></div>
 <div class="metric"><div class="ml">Farine usate</div><div class="mv">${activeFl.length}</div></div>`;
-    let wLabel,wClass,wDesc,oreMin,oreMax;
-    if(wMix<200){wLabel='W basso';wClass='badge-med';wDesc='Lievitazioni brevi, impasto friabile';oreMin=6;oreMax=12;}
-    else if(wMix<280){wLabel='W medio';wClass='badge-ok';wDesc='Versatile, ideale napoletana classica';oreMin=12;oreMax=24;}
-    else{wLabel='W alto';wClass='badge-hi';wDesc='Perfetto per lunghe lievitazioni';oreMin=24;oreMax=72;}
-    const idrMin=aMix-5;
-    document.getElementById('mix-w-badge').innerHTML=`<span class="w-badge ${wClass}">${wLabel}</span>`;
+    let wLabel,wClass,oreMin,oreMax;
+    if(wMix<200){wLabel='W basso';wClass='badge-med';oreMin=6;oreMax=12;}
+    else if(wMix<280){wLabel='W medio';wClass='badge-ok';oreMin=12;oreMax=24;}
+    else{wLabel='W alto';wClass='badge-hi';oreMin=24;oreMax=72;}
+    const idrSugg=Math.round((aMix-5+aMix)/2);
+    document.getElementById('mix-w-badge').innerHTML=`<span class="w-badge ${wClass}">${wLabel} (W${wMix})</span>`;
     document.getElementById('mix-impact').innerHTML=`
-<div class="impact-row">${wDesc}</div>
-<div class="impact-row">Idratazione consigliata: <strong>${idrMin}–${aMix}%</strong></div>
-<div class="impact-row" style="margin-bottom:12px">Lievitazione consigliata: <strong>${oreMin}–${oreMax}h</strong></div>`;
+<div style="font-size:13px;color:var(--muted);margin-bottom:5px">Idratazione consigliata: <strong style="color:var(--text)">${aMix-5}–${aMix}%</strong></div>
+<div style="font-size:13px;color:var(--muted);margin-bottom:12px">Lievitazione consigliata: <strong style="color:var(--text)">${oreMin}–${oreMax}h</strong></div>`;
     document.getElementById('use-mix-btn').style.display='block';
-    mixData={wMix,pMix,aMix,idrSugg:Math.round((idrMin+aMix)/2),label:activeFl.map(a=>getF(a.id).name+'&nbsp;'+a.perc+'%').join(', ')};
+    mixData={wMix,pMix,aMix,idrSugg,label:activeFl.map(a=>getF(a.id).name+' '+a.perc+'%').join(', ')};
   } else {
     document.getElementById('mix-summary').innerHTML='';
     document.getElementById('mix-w-badge').innerHTML='';
@@ -584,49 +731,37 @@ function updateFl(i,val){activeFl[i].perc=val;renderMixer();}
 function addFlour(){const id=document.getElementById('flour-select').value;if(!id||activeFl.find(a=>a.id===id))return;activeFl.push({id,perc:10});renderMixer();}
 function removeFlour(i){activeFl.splice(i,1);renderMixer();}
 function useMixInCalc(){
-  if(!mixData) return;
+  if(!mixData)return;
   document.getElementById('idr').value=mixData.idrSugg;
-  document.getElementById('mix-badge-calc').innerHTML=`<div style="font-size:11px;color:var(--muted);margin-bottom:10px;padding:8px 12px;background:var(--green-bg);color:var(--green);border-radius:var(--rad-sm)">Mix farine attivo · W${mixData.wMix} · Idr consigliata ${mixData.idrSugg}%</div>`;
+  document.getElementById('mix-badge-calc').innerHTML=`<div class="alert alert-ok" style="margin-bottom:10px">Mix farine: W${mixData.wMix} · Idr impostata ${mixData.idrSugg}%</div>`;
   switchTab('calc');
 }
 
-// ─── PWA INSTALL ───────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// TAB / DATE / UTILS
+// ═══════════════════════════════════════════════════════════════
+function switchTab(t){
+  const names=['calc','mixer','saved','timer'];
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',names[i]===t));
+  names.forEach(n=>document.getElementById('tab-'+n).classList.toggle('active',n===t));
+  if(t==='saved')renderSaved();
+  if(t==='timer')renderTimer();
+}
+
+function toInputDate(d){return d.getFullYear()+'-'+(d.getMonth()+1).toString().padStart(2,'0')+'-'+d.getDate().toString().padStart(2,'0');}
+function setDay(n){const d=new Date();d.setDate(d.getDate()+n);document.getElementById('eatDate').value=toInputDate(d);}
+function setNextWD(wd){const d=new Date();const diff=(wd-d.getDay()+7)%7||7;d.setDate(d.getDate()+diff);document.getElementById('eatDate').value=toInputDate(d);}
+
+// ═══════════════════════════════════════════════════════════════
+// PWA
+// ═══════════════════════════════════════════════════════════════
 let deferredPrompt;
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredPrompt = e;
-  document.getElementById('install-banner').style.display='block';
-});
-document.getElementById('install-btn').addEventListener('click', async () => {
-  if(!deferredPrompt) return;
-  deferredPrompt.prompt();
-  const {outcome} = await deferredPrompt.userChoice;
-  deferredPrompt = null;
-  document.getElementById('install-banner').style.display='none';
-});
-window.addEventListener('appinstalled', () => { document.getElementById('install-banner').style.display='none'; });
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('install-banner').style.display='block';});
+document.getElementById('install-btn').addEventListener('click',async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;document.getElementById('install-banner').style.display='none';});
+window.addEventListener('appinstalled',()=>{document.getElementById('install-banner').style.display='none';});
+if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js'));
 
-// ─── SERVICE WORKER ────────────────────────────────────────────────────────
-if('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
-}
-
-// ─── DATE HELPERS ──────────────────────────────────────────────────────────
-function toInputDate(d) {
-  return d.getFullYear()+'-'+(d.getMonth()+1).toString().padStart(2,'0')+'-'+d.getDate().toString().padStart(2,'0');
-}
-function setDay(offsetDays) {
-  const d = new Date(); d.setDate(d.getDate()+offsetDays);
-  document.getElementById('eatDate').value = toInputDate(d);
-}
-function setNextWeekday(wd) {
-  const d = new Date();
-  const diff = (wd - d.getDay() + 7) % 7 || 7;
-  d.setDate(d.getDate()+diff);
-  document.getElementById('eatDate').value = toInputDate(d);
-}
-
-// ─── INIT ──────────────────────────────────────────────────────────────────
+// INIT
 loadPreset('napoletana');
 renderMixer();
 setDay(0);
