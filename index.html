@@ -135,6 +135,7 @@
     <div class="tabs">
       <button class="tab active" onclick="switchTab('calc')">Calcola</button>
       <button class="tab" onclick="switchTab('mixer')">Farine</button>
+      <button class="tab" onclick="switchTab('pro')">Pro 🔧</button>
       <button class="tab" onclick="switchTab('saved')">Salvati</button>
       <button class="tab" onclick="switchTab('timer')">Timer</button>
     </div>
@@ -229,6 +230,82 @@
   <div class="page" id="tab-timer">
     <div id="timer-container"><div class="empty" style="padding-top:3rem">Calcola un impasto per avviare il timer</div></div>
   </div>
+  <!-- PRO -->
+  <div class="page" id="tab-pro">
+
+    <!-- TU IMPASTATRICE -->
+    <div style="margin-top:14px" class="sec-title">Temperatura uscita impasto</div>
+    <div class="card">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Famag Grilletta · spirale · formula professionale con coefficiente attrito</div>
+      <div class="row2">
+        <div class="field"><label>T° farina (°C)</label><input type="number" id="tu-tfarina" value="20"></div>
+        <div class="field"><label>T° ambiente (°C)</label><input type="number" id="tu-tamb" value="21"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>T° acqua (°C)</label><input type="number" id="tu-tacqua" value="16"></div>
+        <div class="field"><label>Peso impasto (kg)</label><input type="number" id="tu-kg" value="1.5" step="0.1" min="0.5"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Minuti V1 (lenta)</label><input type="number" id="tu-v1min" value="5" min="0"></div>
+        <div class="field"><label>Minuti V2 (veloce)</label><input type="number" id="tu-v2min" value="8" min="0"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Idratazione (%)</label><input type="number" id="tu-idr" value="65"></div>
+        <div class="field" style="justify-content:flex-end;padding-bottom:2px">
+          <label style="visibility:hidden">_</label>
+          <button class="btn-primary" style="margin:0" onclick="calcolaTU()">Calcola TU</button>
+        </div>
+      </div>
+      <div id="tu-output"></div>
+    </div>
+
+    <!-- COTTURA P134H -->
+    <div class="sec-title" style="margin-top:8px">Cottura · Forno P134H</div>
+    <div class="card">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Camera bassa · resistenze separate platea/cielo</div>
+      <div class="row2">
+        <div class="field"><label>Tipo pizza</label>
+          <select id="cottura-tipo" onchange="renderCottura()">
+            <option value="napoletana">Napoletana tonda</option>
+            <option value="teglia">Teglia / padellino</option>
+            <option value="pinsa">Pinsa</option>
+          </select>
+        </div>
+        <div class="field"><label>Peso panetto (g)</label><input type="number" id="cottura-peso" value="250" oninput="renderCottura()"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Spessore impasto</label>
+          <select id="cottura-spessore" onchange="renderCottura()">
+            <option value="sottile">Sottile / classico</option>
+            <option value="medio">Medio</option>
+            <option value="alto">Alto / pan</option>
+          </select>
+        </div>
+        <div class="field"><label>Condimento</label>
+          <select id="cottura-condimento" onchange="renderCottura()">
+            <option value="standard">Standard (mozzarella)</option>
+            <option value="bianca">Bianca / poca farcitura</option>
+            <option value="ricca">Ricca / umida</option>
+          </select>
+        </div>
+      </div>
+      <div id="cottura-output"></div>
+    </div>
+
+    <!-- CALCOLATRICE T ACQUA -->
+    <div class="sec-title" style="margin-top:8px">Calcolatrice T° acqua (regola 55)</div>
+    <div class="card">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:12px">T_farina + T_ambiente + T_acqua + attrito ≈ 55 (spirale)</div>
+      <div class="row3">
+        <div class="field"><label>T° farina (°C)</label><input type="number" id="r55-farina" value="20" oninput="calcR55()"></div>
+        <div class="field"><label>T° ambiente (°C)</label><input type="number" id="r55-amb" value="21" oninput="calcR55()"></div>
+        <div class="field"><label>T° uscita desid.</label><input type="number" id="r55-tu" value="23" oninput="calcR55()"></div>
+      </div>
+      <div id="r55-output"></div>
+    </div>
+
+  </div>
+
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -741,11 +818,12 @@ function useMixInCalc(){
 // TAB / DATE / UTILS
 // ═══════════════════════════════════════════════════════════════
 function switchTab(t){
-  const names=['calc','mixer','saved','timer'];
+  const names=['calc','mixer','pro','saved','timer'];
   document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',names[i]===t));
   names.forEach(n=>document.getElementById('tab-'+n).classList.toggle('active',n===t));
   if(t==='saved')renderSaved();
   if(t==='timer')renderTimer();
+  if(t==='pro'){renderCottura();calcR55();}
 }
 
 function toInputDate(d){return d.getFullYear()+'-'+(d.getMonth()+1).toString().padStart(2,'0')+'-'+d.getDate().toString().padStart(2,'0');}
@@ -760,6 +838,168 @@ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPro
 document.getElementById('install-btn').addEventListener('click',async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;document.getElementById('install-banner').style.display='none';});
 window.addEventListener('appinstalled',()=>{document.getElementById('install-banner').style.display='none';});
 if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js'));
+
+
+// ═══════════════════════════════════════════════════════════════
+// PRO: TEMPERATURA USCITA IMPASTO — Famag Grilletta spirale
+// Modello: TU = (T_farina + T_ambiente + T_acqua) / 3 + attrito
+// Attrito spirale: V1 ≈ 1.5°C/min*coeff, V2 ≈ 3°C/min*coeff
+// Coeff idratazione: più acqua = meno attrito (-0.008 per % sopra 65)
+// Coeff massa: più impasto = più attrito (+0.05 per kg sopra 1kg)
+// ═══════════════════════════════════════════════════════════════
+
+function calcolaTU() {
+  const Tf = parseFloat(document.getElementById('tu-tfarina').value);
+  const Ta = parseFloat(document.getElementById('tu-tamb').value);
+  const Tac = parseFloat(document.getElementById('tu-tacqua').value);
+  const kg = parseFloat(document.getElementById('tu-kg').value);
+  const v1 = parseFloat(document.getElementById('tu-v1min').value) || 0;
+  const v2 = parseFloat(document.getElementById('tu-v2min').value) || 0;
+  const idr = parseFloat(document.getElementById('tu-idr').value);
+
+  // Temperatura base media ingredienti (ponderata: farina 50%, acqua idr%, ambiente residuo)
+  const w_farina = 1.0;
+  const w_acqua = idr / 100;
+  const T_media = (Tf * w_farina + Tac * w_acqua) / (w_farina + w_acqua);
+
+  // Attrito: coefficiente base spirale Famag Grilletta
+  const k_idr = 1 - Math.max(0, (idr - 65)) * 0.01;   // alta idr = meno attrito
+  const k_kg  = 1 + Math.max(0, (kg - 1.0)) * 0.04;   // più kg = più attrito
+
+  const attrito_v1 = v1 * 0.35 * k_idr * k_kg;  // °C totali V1
+  const attrito_v2 = v2 * 0.65 * k_idr * k_kg;  // °C totali V2
+  const attrito_tot = attrito_v1 + attrito_v2;
+
+  const TU = T_media + attrito_tot;
+  const TU_target = 23; // target classico napoletana
+  const diff = TU - TU_target;
+
+  // Calcola T acqua corretta per ottenere TU target
+  const attrito_fixed = attrito_tot;
+  const Tac_corr = (TU_target * (w_farina + w_acqua) - Tf * w_farina) / w_acqua - attrito_fixed / w_acqua * (w_farina + w_acqua) / w_acqua;
+
+  let colorClass = 'alert-ok', msg = 'TU ottimale per napoletana';
+  if (TU > 26) { colorClass = 'alert-warn'; msg = 'TU troppo alta: rischio impasto troppo caldo, attivazione precoce'; }
+  else if (TU > 24) { colorClass = 'alert-warn'; msg = 'TU leggermente alta: riduci T acqua'; }
+  else if (TU < 20) { colorClass = 'alert-info'; msg = 'TU bassa: lievitazione più lenta del previsto'; }
+
+  document.getElementById('tu-output').innerHTML = `
+<div class="divider"></div>
+<div class="metrics" style="margin-bottom:8px">
+  <div class="metric"><div class="ml">T° uscita calcolata</div><div class="mv" style="font-size:26px">${TU.toFixed(1)}<span class="mu"> °C</span></div></div>
+  <div class="metric"><div class="ml">Attrito totale</div><div class="mv">${attrito_tot.toFixed(1)}<span class="mu"> °C</span></div></div>
+  <div class="metric"><div class="ml">Attrito V1 (${v1} min)</div><div class="mv">${attrito_v1.toFixed(1)}<span class="mu"> °C</span></div></div>
+  <div class="metric"><div class="ml">Attrito V2 (${v2} min)</div><div class="mv">${attrito_v2.toFixed(1)}<span class="mu"> °C</span></div></div>
+</div>
+<div class="alert ${colorClass}" style="margin-bottom:8px">${msg}</div>
+<div style="font-size:13px;color:var(--muted);padding:8px 0">Per ottenere TU ${TU_target}°C → usa acqua a <strong style="color:var(--text)">${Math.round(Tac_corr)}°C</strong></div>
+<div style="font-size:11px;color:var(--hint);padding-bottom:4px">V1: attrito basso (impastamento lento) · V2: attrito alto (incordatura)</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PRO: COTTURA P134H
+// ═══════════════════════════════════════════════════════════════
+const P134H_PROFILES = {
+  napoletana: {
+    sottile: { platea:[300,320], cielo:[250,270], minuti:[6,9],   fase2: null,
+      note:'Preriscalda almeno 30 min. Inforna su platea diretta. Ruota a metà cottura. Cerca il leopardato sul cornicione.' },
+    medio:    { platea:[280,300], cielo:[230,250], minuti:[8,11],  fase2: null,
+      note:'Stesso metodo, cottura leggermente più lunga per il maggiore spessore.' },
+    alto:     { platea:[260,280], cielo:[210,230], minuti:[10,14], fase2: null,
+      note:'Abbassa platea e cielo per evitare bruciature prima che il cuore cuocia.' },
+  },
+  teglia: {
+    sottile: { platea:[250,270], cielo:[220,240], minuti:[8,11],
+      fase2:{label:'+ gratinatura finale cielo',platea:null,cielo:[260,280],minuti:[2,3]},
+      note:'Prima fase: cuoci la base. Seconda fase: alza il cielo per gratinare la mozzarella.' },
+    medio:   { platea:[240,260], cielo:[210,230], minuti:[10,14],
+      fase2:{label:'+ gratinatura finale cielo',platea:null,cielo:[250,270],minuti:[2,4]},
+      note:'Cottura in due fasi per teglie più spesse. Usa la teglia oleata direttamente sulla platea.' },
+    alto:    { platea:[220,240], cielo:[200,220], minuti:[14,18],
+      fase2:{label:'+ gratinatura finale cielo',platea:null,cielo:[240,260],minuti:[3,5]},
+      note:'Pan pizza alto: cottura lenta con platea moderata. Controlla la base prima di aggiungere mozzarella.' },
+  },
+  pinsa: {
+    sottile: { platea:[270,290], cielo:[230,250], minuti:[5,8],   fase2: null,
+      note:'Cottura rapida e croccante. Inforna senza condimento, aggiungi mozzarella solo negli ultimi 2 min.' },
+    medio:   { platea:[260,280], cielo:[220,240], minuti:[7,10],  fase2: null,
+      note:'Pinsa classica. Buona croccantezza con interno morbido.' },
+    alto:    { platea:[245,265], cielo:[210,230], minuti:[9,13],  fase2: null,
+      note:'Pinsa soffice: abbassa le temperature per una cottura uniforme.' },
+  }
+};
+
+function renderCottura() {
+  const tipo = document.getElementById('cottura-tipo').value;
+  const spessore = document.getElementById('cottura-spessore').value;
+  const condimento = document.getElementById('cottura-condimento').value;
+  const peso = parseInt(document.getElementById('cottura-peso').value) || 250;
+
+  const p = P134H_PROFILES[tipo][spessore];
+
+  // Correzione condimento
+  let dc = 0, dt = 0;
+  if (condimento === 'ricca') { dc = -10; dt = 2; }
+  if (condimento === 'bianca') { dc = +10; dt = -1; }
+
+  // Correzione peso
+  const ref_peso = tipo === 'teglia' ? 800 : tipo === 'pinsa' ? 300 : 250;
+  const dp = Math.round((peso - ref_peso) / ref_peso * 15);
+  const dt_peso = Math.round((peso - ref_peso) / ref_peso * 2);
+
+  const platea1 = [p.platea[0]+dp, p.platea[1]+dp];
+  const cielo1  = [p.cielo[0]+dc,  p.cielo[1]+dc];
+  const minuti1 = [Math.max(3, p.minuti[0]+dt+dt_peso), Math.max(4, p.minuti[1]+dt+dt_peso)];
+
+  let f2html = '';
+  if (p.fase2) {
+    const c2 = [p.fase2.cielo[0]+dc, p.fase2.cielo[1]+dc];
+    f2html = `
+<div class="divider"></div>
+<div style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Fase 2 — ${p.fase2.label}</div>
+<div class="metrics" style="margin-bottom:0">
+  ${p.fase2.platea ? `<div class="metric"><div class="ml">Platea</div><div class="mv">${p.fase2.platea[0]}–${p.fase2.platea[1]}<span class="mu"> °C</span></div></div>` : ''}
+  <div class="metric"><div class="ml">Cielo</div><div class="mv">${c2[0]}–${c2[1]}<span class="mu"> °C</span></div></div>
+  <div class="metric"><div class="ml">Durata</div><div class="mv">${p.fase2.minuti[0]}–${p.fase2.minuti[1]}<span class="mu"> min</span></div></div>
+</div>`;
+  }
+
+  document.getElementById('cottura-output').innerHTML = `
+<div class="divider"></div>
+<div style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Fase 1 — cottura</div>
+<div class="metrics" style="margin-bottom:0">
+  <div class="metric"><div class="ml">Platea</div><div class="mv">${platea1[0]}–${platea1[1]}<span class="mu"> °C</span></div></div>
+  <div class="metric"><div class="ml">Cielo</div><div class="mv">${cielo1[0]}–${cielo1[1]}<span class="mu"> °C</span></div></div>
+  <div class="metric"><div class="ml">Durata stimata</div><div class="mv">${minuti1[0]}–${minuti1[1]}<span class="mu"> min</span></div></div>
+  <div class="metric"><div class="ml">Preriscaldo</div><div class="mv">≥ 30<span class="mu"> min</span></div></div>
+</div>
+${f2html}
+<div style="font-size:12px;color:var(--muted);margin-top:12px;line-height:1.6">${p.note}</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PRO: REGOLA 55 — T acqua
+// ═══════════════════════════════════════════════════════════════
+function calcR55() {
+  const Tf  = parseFloat(document.getElementById('r55-farina').value) || 20;
+  const Ta  = parseFloat(document.getElementById('r55-amb').value)    || 21;
+  const TU  = parseFloat(document.getElementById('r55-tu').value)     || 23;
+  // Per spirale il coefficiente attrito medio è ~4-6°C, usiamo 5 come default
+  const attrito = 5;
+  const Tacqua = (TU * 3) - Tf - Ta - attrito;
+  let msg = '', cls = 'alert-ok';
+  if (Tacqua < 2)  { msg = 'Usa acqua ghiacciata o aggiungi cubetti di ghiaccio'; cls = 'alert-info'; }
+  else if (Tacqua < 8)  { msg = 'Acqua molto fredda — tienila in frigo almeno 2h'; cls = 'alert-info'; }
+  else if (Tacqua > 30) { msg = 'Acqua tiepida — attenzione a non attivare il lievito prematuramente'; cls = 'alert-warn'; }
+  else { msg = 'Temperatura acqua nella norma'; }
+  document.getElementById('r55-output').innerHTML = `
+<div class="divider" style="margin:10px 0"></div>
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+  <div style="font-size:13px;color:var(--muted)">T° acqua da usare:</div>
+  <div style="font-size:28px;font-weight:500;font-family:'DM Mono',monospace">${Math.round(Tacqua)}<span style="font-size:14px;color:var(--muted);font-weight:400"> °C</span></div>
+</div>
+<div class="alert ${cls}" style="margin:0">${msg}</div>`;
+}
 
 // INIT
 loadPreset('napoletana');
