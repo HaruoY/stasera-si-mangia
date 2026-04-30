@@ -1,14 +1,15 @@
 {
   "name": "Stasera si mangia",
   "short_name": "Stasera si mangia",
-  "description": "Calcolatore impasto pizza con mixer farine, timer e salvataggio ricette",
-  "start_url": "/",
+  "description": "Calcolatore impasto pizza con mixer farine, timer e strumenti pro",
+  "start_url": "/stasera-si-mangia/",
+  "scope": "/stasera-si-mangia/",
   "display": "standalone",
   "background_color": "#f7f6f2",
   "theme_color": "#1a1a1a",
   "orientation": "portrait",
   "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "/stasera-si-mangia/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/stasera-si-mangia/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ]
 }
