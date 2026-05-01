@@ -117,46 +117,6 @@
     .install-text strong{display:block;font-size:14px;margin-bottom:2px}
     .install-text span{color:var(--muted);font-size:12px}
     .install-btn{padding:8px 14px;background:var(--text);color:var(--bg);border:none;border-radius:var(--rsm);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap}
-
-    /* SUB-TABS FARINE */
-    .subtabs{display:flex;gap:0;border-bottom:0.5px solid var(--border);margin-bottom:14px}
-    .subtab{flex:1;padding:7px 4px;font-size:12px;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif}
-    .subtab.active{color:var(--text);border-bottom-color:var(--text);font-weight:500}
-    .subpage{display:none}
-    .subpage.active{display:block}
-    /* SCHEDE FARINE */
-    .fcard{background:var(--card);border:0.5px solid var(--border);border-radius:var(--rad);padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:border-color .15s}
-    .fcard:hover{border-color:var(--bm)}
-    .fcard.fcmp{border:1.5px solid var(--blue)}
-    .fcard.fsaved{border-left:3px solid var(--green)}
-    .fcard-brand{font-size:10px;color:var(--hint);text-transform:uppercase;letter-spacing:.06em}
-    .fcard-name{font-size:14px;font-weight:500;color:var(--text);margin:2px 0 3px}
-    .fcard-specs{font-size:11px;color:var(--muted)}
-    .fcard-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
-    .fcard-prot{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;text-align:right}
-    .fbadge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:10px;margin-left:4px;font-weight:500}
-    .badge-pur{background:var(--pbg,#ead8fa);color:var(--purple,#4a2d7a)}
-    .badge-new{background:#d8f5ee;color:#0f5c44}
-    .search-f{width:100%;padding:9px 11px;border:0.5px solid var(--bm);border-radius:var(--rsm);background:var(--card);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;margin-bottom:10px}
-    .fpills{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
-    .fpill{padding:3px 10px;font-size:11px;border-radius:20px;cursor:pointer;background:var(--card);border:0.5px solid var(--bm);color:var(--muted);font-family:'DM Sans',sans-serif}
-    .fpill.active{background:var(--text);color:var(--bg);border-color:var(--text);font-weight:500}
-    .frow{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:0.5px solid var(--border);font-size:13px}
-    .frow:last-child{border-bottom:none}
-    .frow .fl{color:var(--muted)}.frow .fv{font-weight:500;text-align:right;max-width:60%;font-size:13px}
-    .fstat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:12px 0}
-    .fstat{background:var(--bg);border-radius:var(--rsm);padding:9px 10px;text-align:center}
-    .fstat .fsk{font-size:10px;color:var(--hint);text-transform:uppercase;letter-spacing:.04em}
-    .fstat .fsv{font-size:15px;font-weight:500;color:var(--text);margin-top:2px}
-    .fnote{background:var(--bg);border-left:2px solid var(--bm);padding:9px 11px;font-size:12px;color:var(--muted);line-height:1.55;margin-top:10px}
-    .back-btn{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;padding:0;margin-bottom:12px;font-family:'DM Sans',sans-serif}
-    .back-btn:hover{color:var(--text)}
-    .cmp-header{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px}
-    .cmp-col{background:var(--bg);border-radius:var(--rsm);padding:8px 10px;font-size:11px;font-weight:500;text-align:center;color:var(--text);line-height:1.35}
-    .cmp-row{display:grid;grid-template-columns:90px 1fr 1fr;gap:4px;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px;align-items:center}
-    .cmp-row:last-child{border-bottom:none}
-    .cmp-l{color:var(--muted)}.cmp-v{text-align:center;font-weight:500}
-    .cmp-v.better{color:var(--green)}
   </style>
 </head>
 <body>
@@ -218,9 +178,6 @@
       <div class="field"><label>Olio (%) — opzionale</label><input type="number" id="olio" value="0" step="0.5" min="0" max="10"></div>
       <div class="field"><label>Temp. impasto (°C)</label><input type="number" id="Timp" value="22"></div>
     </div>
-    <div id="aceto-row" class="row2" style="display:none">
-      <div class="field"><label>Aceto di mele (g/kg farina)</label><input type="number" id="aceto" value="0" step="1" min="0"></div>
-    </div>
 
     <div class="sec-title" style="margin-top:8px">Fasi lievitazione</div>
     <div id="fasi-container"></div>
@@ -245,56 +202,23 @@
     <div id="output"></div>
   </div>
 
-  <!-- FARINE (sub-tabbed) -->
+  <!-- MIXER FARINE -->
   <div class="page" id="tab-mixer">
-    <div style="margin-top:14px">
-      <div class="subtabs">
-        <button class="subtab active" onclick="switchSubFarine('mix')">Mix farine</button>
-        <button class="subtab" onclick="switchSubFarine('schede')">Schede tecniche</button>
-        <button class="subtab" onclick="switchSubFarine('confronto')">Confronto</button>
-        <button class="subtab" onclick="switchSubFarine('preferiti')">Preferiti</button>
-      </div>
-      <!-- SUB: MIX -->
-      <div class="subpage active" id="subfarine-mix">
-        <div class="sec-title">Mix di farine</div>
-        <div id="flour-cards"></div>
-        <div id="total-warn"></div>
-        <div class="bar-stack" id="bar-stack"></div>
-        <div class="bar-legend" id="bar-legend"></div>
-        <div class="add-row">
-          <select class="add-select" id="flour-select"></select>
-          <button class="btn-secondary" onclick="addFlour()">+ Aggiungi</button>
-        </div>
-        <div class="divider"></div>
-        <div class="sec-title">Proprietà del mix</div>
-        <div class="metrics" id="mix-summary"></div>
-        <div id="mix-w-badge"></div>
-        <div id="mix-impact"></div>
-        <button class="use-mix-btn" id="use-mix-btn" onclick="useMixInCalc()" style="display:none">Usa questo mix nel calcolatore →</button>
-      </div>
-      <!-- SUB: SCHEDE -->
-      <div class="subpage" id="subfarine-schede">
-        <input type="search" class="search-f" id="f-search" placeholder="Cerca farina, brand, utilizzo..." oninput="filterFarine(this.value)">
-        <div class="fpills" id="f-pills"></div>
-        <div id="f-list"></div>
-        <div id="f-detail" style="display:none"></div>
-      </div>
-      <!-- SUB: CONFRONTO -->
-      <div class="subpage" id="subfarine-confronto">
-        <div class="card">
-          <div class="sec-title">Farine nel confronto</div>
-          <div class="frow"><span class="fl">Farina A</span><span class="fv" id="cmp-slot1">—</span></div>
-          <div class="frow"><span class="fl">Farina B</span><span class="fv" id="cmp-slot2">—</span></div>
-          <p style="font-size:11px;color:var(--hint);margin-top:8px;line-height:1.5">Apri una scheda farina e premi <strong>Aggiungi al confronto</strong> (max 2).</p>
-          <button style="width:100%;margin-top:8px;padding:8px;font-size:12px;cursor:pointer;border-radius:var(--rsm);border:0.5px solid var(--bm);background:var(--card);color:var(--text);font-family:'DM Sans',sans-serif" onclick="clearCompare()">Azzera confronto</button>
-        </div>
-        <div id="cmp-table"></div>
-      </div>
-      <!-- SUB: PREFERITI -->
-      <div class="subpage" id="subfarine-preferiti">
-        <div id="f-saved"></div>
-      </div>
+    <div style="margin-top:14px" class="sec-title">Mix di farine</div>
+    <div id="flour-cards"></div>
+    <div id="total-warn"></div>
+    <div class="bar-stack" id="bar-stack"></div>
+    <div class="bar-legend" id="bar-legend"></div>
+    <div class="add-row">
+      <select class="add-select" id="flour-select"></select>
+      <button class="btn-secondary" onclick="addFlour()">+ Aggiungi</button>
     </div>
+    <div class="divider"></div>
+    <div class="sec-title">Proprietà del mix</div>
+    <div class="metrics" id="mix-summary"></div>
+    <div id="mix-w-badge"></div>
+    <div id="mix-impact"></div>
+    <button class="use-mix-btn" id="use-mix-btn" onclick="useMixInCalc()" style="display:none">Usa questo mix nel calcolatore →</button>
   </div>
 
   <!-- SALVATI -->
@@ -512,10 +436,6 @@ function loadPreset(name) {
   ['idr','sale','Timp','olio','aceto','panetti','pesoPanetto'].forEach(k => {
     const el = document.getElementById(k); if (el) el.value = p[k] !== undefined ? p[k] : 0;
   });
-  aceto = p.aceto || 0;
-  const acetoEl = document.getElementById('aceto'); if (acetoEl) acetoEl.value = aceto;
-  const acetoRow = document.getElementById('aceto-row');
-  if (acetoRow) acetoRow.style.display = aceto > 0 ? 'grid' : 'none';
   fasi = p.fasi.map((f,i) => ({...f, id: i+1}));
   fasiId = fasi.length + 1;
   renderFasi();
@@ -929,7 +849,6 @@ function switchTab(t){
   if(t==='saved')renderSaved();
   if(t==='timer')renderTimer();
   if(t==='pro'){renderCottura();calcR55();}
-  if(t==='mixer'){renderMixer();renderFPills();renderFList();}
 }
 
 function toInputDate(d){return d.getFullYear()+'-'+(d.getMonth()+1).toString().padStart(2,'0')+'-'+d.getDate().toString().padStart(2,'0');}
@@ -1107,182 +1026,9 @@ function calcR55() {
 <div class="alert ${cls}" style="margin:0">${msg}</div>`;
 }
 
-
-// ═══════════════════════════════════════════════════════════════
-// SCHEDE TECNICHE FARINE
-// ═══════════════════════════════════════════════════════════════
-const FARINE_DB=[
-  {id:'cap-piz',brand:'Caputo',name:'Pizzeria',tipo:'00',W:[260,270],PL:[0.5,0.6],prot:12.5,abs:[55,57],stab:null,liev:'5–9 ore',usi:['napoletana'],fonte:'Scheda tecnica ufficiale',note:'La classica "blu" Caputo. Approvata STG. Glutine elastico e morbido, ottima lavorabilità.'},
-  {id:'cap-nuvola',brand:'Caputo',name:'Nuvola',tipo:'0',W:[270,290],PL:[0.5,0.6],prot:12.5,abs:[60,62],stab:null,liev:'10–18 ore',usi:['napoletana','teglia'],fonte:'Scheda tecnica ufficiale',note:'Alta capacità fermentativa naturale. Cornicioni alveolati. 100% naturale senza additivi.'},
-  {id:'cap-nuvsuper',brand:'Caputo',name:'Nuvola Super',tipo:'0',W:[320,340],PL:[0.5,0.6],prot:13.5,abs:[62,65],stab:null,liev:'24–72 ore',usi:['teglia','pinsa'],fonte:'Scheda tecnica ufficiale',note:'Gestisce idratazioni >80% e lunghe maturazioni. Ideale per biga e poolish.'},
-  {id:'cap-rosso',brand:'Caputo',name:'Cuoco (Saccorosso)',tipo:'00',W:[300,320],PL:[0.5,0.6],prot:13.0,abs:[60,63],stab:null,liev:'8–12 ore',usi:['napoletana','teglia'],fonte:'Scheda tecnica ufficiale',note:'Alta forza, versatile tra pizzeria e pasticceria lievitata.'},
-  {id:'spa-avpn',brand:'Spadoni',name:'Napoletana AVPN',tipo:'0',W:[250,280],PL:[0.5,0.7],prot:12.0,abs:[58,62],stab:null,liev:'8–10 ore',usi:['napoletana'],fonte:'Scheda tecnica ufficiale',note:'Approvata AVPN. W e P/L nel range del disciplinare Vera Pizza Napoletana.'},
-  {id:'spa-mugnaio',brand:'Spadoni',name:'Gran Mugnaio Pizza',tipo:'00',W:[200,240],PL:[0.45,0.55],prot:11.0,abs:[54,58],stab:null,liev:'3–6 ore',usi:['napoletana','teglia'],fonte:'Dati verificati',note:'Farina di largo consumo per uso domestico. Lievitazioni brevi-medie.'},
-  {id:'loc-pizza',brand:'Lo Conte',name:'Farine Magiche Pizza',tipo:'00',W:[220,250],PL:[0.5,0.6],prot:12.4,abs:[55,58],stab:null,liev:'4–8 ore',usi:['napoletana','teglia'],fonte:'Dati verificati',note:'Contiene germe madre naturale. Aromi intensi, buona per uso casalingo.'},
-  {id:'loc-manit',brand:'Lo Conte',name:'Manitoba Favola',tipo:'0',W:[380,420],PL:[0.55,0.65],prot:15.0,abs:[70,78],stab:null,liev:'Solo in taglio',usi:['teglia','pinsa'],fonte:'Dati verificati',note:'W elevatissimo: usare max 20-30% in blend. Da sola produce impasti gommosi.'},
-  {id:'vig-vesuvio',brand:'Molino Vigevano',name:'Vesuvio',tipo:'0',W:[270,290],PL:[0.5,0.6],prot:14.5,abs:[60,64],stab:null,liev:'6–12h (48h in frigo)',usi:['napoletana','teglia'],fonte:'Scheda tecnica caricata',isNew:true,note:'Con germe di grano vitale macinato a pietra. Proteine 14.5%. Cornicione alveolato. P/L stimato dal profilo W.'},
-  {id:'piz-amalfi',brand:'Molini Pizzuti',name:"Costa d'Amalfi Oro",tipo:'0',W:[280,320],PL:[0.55,0.75],prot:15.0,abs:[62,70],stab:'>16 min',liev:'10–24 ore',usi:['napoletana','teglia','pinsa'],fonte:'Scheda tecnica caricata',isNew:true,note:'BRC certificato. Proteine 15%, glutine 13.5%, stabilità >16 min. 100% grano italiano.'},
-];
-const FPILLS_LIST=['tutti','napoletana','teglia','pinsa'];
-let fSearch='',fFilter='tutti',fCompare=[],fSavedIds=[];
-function wBadge(W){const a=(W[0]+W[1])/2;if(a<220)return{t:'Debole',c:'badge-med'};if(a<280)return{t:'Media forza',c:'badge-ok'};if(a<350)return{t:'Forte',c:'badge-hi'};return{t:'Molto forte',c:'badge-pur'};}
-function getFar(id){return FARINE_DB.find(f=>f.id===id);}
-function renderFPills(){const el=document.getElementById('f-pills');if(!el)return;el.innerHTML=FPILLS_LIST.map(p=>`<button class="fpill${p===fFilter?' active':''}" onclick="setFFilter('${p}')">${p}</button>`).join('');}
-function setFFilter(f){fFilter=f;renderFPills();renderFList();}
-function filterFarine(q){fSearch=q.toLowerCase();renderFList();}
-function renderFList(){
-  let list=FARINE_DB;
-  if(fSearch)list=list.filter(f=>f.name.toLowerCase().includes(fSearch)||f.brand.toLowerCase().includes(fSearch)||f.usi.some(u=>u.includes(fSearch)));
-  if(fFilter!=='tutti')list=list.filter(f=>f.usi.includes(fFilter));
-  const el=document.getElementById('f-list');if(!el)return;
-  el.innerHTML=list.length?list.map(f=>{
-    const wb=wBadge(f.W);
-    return`<div class="fcard${fSavedIds.includes(f.id)?' fsaved':''}${fCompare.includes(f.id)?' fcmp':''}" onclick="showFDetail('${f.id}')">
-      <div class="fcard-top"><div style="flex:1;min-width:0">
-        <div class="fcard-brand">${f.brand}${f.isNew?'<span class="fbadge badge-new" style="margin-left:4px">Nuova</span>':''}</div>
-        <div class="fcard-name">${f.name}<span class="fbadge ${wb.c}">${wb.t}</span></div>
-        <div class="fcard-specs">Tipo ${f.tipo} · W ${f.W[0]}–${f.W[1]} · P/L ${f.PL[0].toFixed(2)}–${f.PL[1].toFixed(2)}</div>
-        <div class="fcard-specs" style="font-size:10px;color:var(--hint);margin-top:2px">${f.fonte}</div>
-      </div>
-      <div class="fcard-prot">${f.prot}%<br><span style="font-size:10px;font-weight:400;color:var(--muted)">prot.</span></div></div>
-    </div>`}).join(''):'<div class="empty">Nessuna farina trovata.</div>';
-}
-function showFDetail(id){
-  const f=getFar(id);if(!f)return;const wb=wBadge(f.W);
-  const fl=document.getElementById('f-list'),fs=document.getElementById('f-search'),fp=document.getElementById('f-pills'),det=document.getElementById('f-detail');
-  if(fl)fl.style.display='none';if(fs)fs.style.display='none';if(fp)fp.style.display='none';if(det)det.style.display='block';
-  const isSaved=fSavedIds.includes(id),inCmp=fCompare.includes(id);
-  det.innerHTML=`<button class="back-btn" onclick="backFList()">← Lista farine</button>
-  <div class="card">
-    <div class="fcard-brand">${f.brand}${f.isNew?'<span class="fbadge badge-new" style="margin-left:5px">Da scheda tecnica</span>':''}</div>
-    <div style="font-size:16px;font-weight:500;margin:3px 0 7px">${f.name}</div>
-    <div><span class="fbadge ${wb.c}" style="margin-left:0;padding:3px 9px">${wb.t}</span></div>
-    <div class="fstat-grid">
-      <div class="fstat"><div class="fsk">W</div><div class="fsv">${f.W[0]}–${f.W[1]}</div></div>
-      <div class="fstat"><div class="fsk">P/L</div><div class="fsv">${f.PL[0].toFixed(2)}–${f.PL[1].toFixed(2)}</div></div>
-      <div class="fstat"><div class="fsk">Proteine</div><div class="fsv">${f.prot}%</div></div>
-    </div>
-    <div class="frow"><span class="fl">Tipo</span><span class="fv">Tipo ${f.tipo}</span></div>
-    <div class="frow"><span class="fl">Assorbimento</span><span class="fv">${f.abs[0]}–${f.abs[1]}%</span></div>
-    ${f.stab?`<div class="frow"><span class="fl">Stabilità</span><span class="fv">${f.stab}</span></div>`:''}
-    <div class="frow"><span class="fl">Lievitazione</span><span class="fv">${f.liev}</span></div>
-    <div class="frow"><span class="fl">Utilizzi</span><span class="fv" style="font-size:11px">${f.usi.join(', ')}</span></div>
-    <div class="frow"><span class="fl">Fonte</span><span class="fv" style="font-size:11px">${f.fonte}</span></div>
-    <div class="fnote">${f.note}</div>
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-    <button class="btn-primary" style="margin:0" onclick="usaFarinaRicetta('${id}')">Usa per ricetta</button>
-    <button class="btn-secondary" style="width:100%" onclick="toggleFSave('${id}')" id="btn-fsave-${id}">${isSaved?'Rimuovi':'Salva preferiti'}</button>
-  </div>
-  <button style="width:100%;padding:9px;font-size:13px;cursor:pointer;border-radius:var(--rsm);border:0.5px solid var(--bm);background:var(--card);color:var(--text);font-family:'DM Sans',sans-serif" onclick="toggleFCompare('${id}')" id="btn-fcmp-${id}">${inCmp?'Rimuovi dal confronto':'Aggiungi al confronto'}</button>
-  <div id="farin-ricetta-${id}"></div>`;
-}
-function backFList(){
-  const fl=document.getElementById('f-list'),fs=document.getElementById('f-search'),fp=document.getElementById('f-pills'),det=document.getElementById('f-detail');
-  if(fl)fl.style.display='block';if(fs)fs.style.display='block';if(fp)fp.style.display='flex';if(det)det.style.display='none';
-  renderFList();
-}
-function toggleFSave(id){
-  fSavedIds=fSavedIds.includes(id)?fSavedIds.filter(x=>x!==id):[...fSavedIds,id];
-  renderFSaved();const btn=document.getElementById('btn-fsave-'+id);
-  if(btn)btn.textContent=fSavedIds.includes(id)?'Rimuovi':'Salva preferiti';
-  renderFList();
-}
-function renderFSaved(){
-  const el=document.getElementById('f-saved');if(!el)return;
-  el.innerHTML=fSavedIds.length?fSavedIds.map(id=>{
-    const f=getFar(id);if(!f)return'';const wb=wBadge(f.W);
-    return`<div class="fcard" onclick="showFDetail('${id}');switchSubFarine('schede')">
-      <div class="fcard-brand">${f.brand}</div>
-      <div class="fcard-name">${f.name}<span class="fbadge ${wb.c}">${wb.t}</span></div>
-      <div class="fcard-specs">W ${f.W[0]}–${f.W[1]} · ${f.prot}% prot.</div>
-    </div>`;}).join(''):'<div class="empty">Nessuna farina salvata.<br>Apri una scheda e premi Salva preferiti.</div>';
-}
-function toggleFCompare(id){
-  if(fCompare.includes(id)){fCompare=fCompare.filter(x=>x!==id);}
-  else if(fCompare.length<2){fCompare.push(id);}
-  else{fCompare[1]=id;}
-  updateCmpSlots();renderCmpTable();
-  const btn=document.getElementById('btn-fcmp-'+id);
-  if(btn)btn.textContent=fCompare.includes(id)?'Rimuovi dal confronto':'Aggiungi al confronto';
-}
-function clearCompare(){fCompare=[];updateCmpSlots();renderCmpTable();}
-function updateCmpSlots(){
-  const s1=document.getElementById('cmp-slot1'),s2=document.getElementById('cmp-slot2');
-  if(s1)s1.textContent=fCompare[0]?getFar(fCompare[0]).name:'—';
-  if(s2)s2.textContent=fCompare[1]?getFar(fCompare[1]).name:'—';
-}
-function renderCmpTable(){
-  const el=document.getElementById('cmp-table');if(!el)return;
-  if(fCompare.length<2){el.innerHTML='';return;}
-  const a=getFar(fCompare[0]),b=getFar(fCompare[1]);
-  const wA=Math.round((a.W[0]+a.W[1])/2),wB=Math.round((b.W[0]+b.W[1])/2);
-  const rows=[
-    {l:'Tipo',va:`Tipo ${a.tipo}`,vb:`Tipo ${b.tipo}`,num:false},
-    {l:'W medio',va:wA,vb:wB,num:true},
-    {l:'P/L medio',va:((a.PL[0]+a.PL[1])/2).toFixed(2),vb:((b.PL[0]+b.PL[1])/2).toFixed(2),num:false},
-    {l:'Proteine',va:a.prot,vb:b.prot,num:true,u:'%'},
-    {l:'Assorbimento',va:`${a.abs[0]}–${a.abs[1]}%`,vb:`${b.abs[0]}–${b.abs[1]}%`,num:false},
-    {l:'Stabilità',va:a.stab||'n.d.',vb:b.stab||'n.d.',num:false},
-    {l:'Lievitazione',va:a.liev,vb:b.liev,num:false},
-  ];
-  el.innerHTML=`<div class="card"><div class="cmp-header"><div class="cmp-col">${a.brand}<br><strong>${a.name}</strong></div><div class="cmp-col">${b.brand}<br><strong>${b.name}</strong></div></div>${rows.map(r=>{let ca='cmp-v',cb='cmp-v';if(r.num&&typeof r.va==='number'){if(r.va>r.vb)ca='cmp-v better';else if(r.vb>r.va)cb='cmp-v better';}return`<div class="cmp-row"><span class="cmp-l">${r.l}</span><span class="${ca}">${r.u?r.va+r.u:r.va}</span><span class="${cb}">${r.u?r.vb+r.u:r.vb}</span></div>`;}).join('')}</div>`;
-}
-function usaFarinaRicetta(id){
-  const f=getFar(id);if(!f)return;
-  const tipo=prompt(`Tipo impasto per ${f.name}:\n1. napoletana  2. teglia  3. pinsa  4. focaccia  5. pane\n\nScrivi il numero:`)||'1';
-  const tipiMap={'1':'napoletana','2':'teglia','3':'pinsa','4':'focaccia','5':'pane'};
-  const tipoSel=tipiMap[tipo.trim()]||'napoletana';
-  const temp=parseFloat(prompt('Temperatura ambiente (\xb0C):')||'21.5');
-  const kg=parseInt(prompt('Grammi di farina:')||'1000');
-  const absAvg=(f.abs[0]+f.abs[1])/2;
-  const tempF=temp<18?1.8:temp<20?1.3:temp<23?1.0:temp<26?0.65:0.35;
-  let idrat,sale,liev,olio=0,puntata,appretto,matur,note,extra=[];
-  if(tipoSel==='napoletana'){idrat=Math.min(64,Math.max(55,Math.round(absAvg*0.97)));sale=28;liev=parseFloat((0.5*tempF).toFixed(1));puntata='2 ore';appretto=temp>24?'4–6 ore':temp<20?'8–10 ore':'6–8 ore';matur=temp>24?'6–8 ore':temp<20?'10–12 ore':'8–10 ore';note='Impasto diretto senza grassi. Stesura a mano.';}
-  else if(tipoSel==='teglia'){idrat=Math.min(82,Math.max(68,Math.round(absAvg*1.08)));sale=25;liev=parseFloat((0.3*tempF).toFixed(1));olio=30;puntata='30 min';appretto='6–10 ore';matur='12–24 ore (frigo)';note='Alta idratazione. Lunga maturazione in frigo.';}
-  else if(tipoSel==='pinsa'){idrat=Math.min(85,Math.max(75,Math.round(absAvg*1.15)));sale=22;liev=parseFloat((0.15*tempF).toFixed(1));olio=20;extra=[{l:'Farina riso (10%)',v:Math.round(kg*0.1)}];puntata='30 min';appretto='48–72h (frigo)';matur='72h (frigo)';note='Maturazione lunga obbligatoria.';}
-  else if(tipoSel==='focaccia'){idrat=Math.min(80,Math.max(65,Math.round(absAvg*1.05)));sale=18;liev=parseFloat((2.0*tempF).toFixed(1));olio=50;puntata='1 ora';appretto='30 min in teglia';matur='2–3 ore';note='Teglia oliata. Cottura 220\xb0C.';}
-  else{idrat=Math.min(72,Math.max(58,Math.round(absAvg*0.98)));sale=20;liev=parseFloat((1.5*tempF).toFixed(1));puntata='1–2 ore';appretto='1–2 ore';matur='3–4 ore';note='Aggiungere 20% tipo 1 per aromi pi\xf9 intensi.';}
-  const acquaG=Math.round(kg*idrat/100),saleG=Math.round(kg*sale/1000),lievG=parseFloat((liev*kg/1000).toFixed(1)),olioG=olio?Math.round(kg*olio/1000):0;
-  const panetti2=Math.max(1,Math.round((kg+acquaG+saleG+lievG+olioG)/260));
-  const wAvg=(f.W[0]+f.W[1])/2,wMin={napoletana:240,teglia:280,pinsa:320,focaccia:180,pane:180};
-  const adatta=wAvg>=(wMin[tipoSel]||200);
-  const elR=document.getElementById('farin-ricetta-'+id);if(!elR)return;
-  elR.innerHTML=`<div class="card" style="margin-top:10px">
-  <div class="sec-title">Ricetta ${tipoSel} · ${kg}g</div>
-  <div class="metrics">
-    <div class="metric"><div class="ml">Acqua</div><div class="mv">${acquaG}<span class="mu"> g (${idrat}%)</span></div></div>
-    <div class="metric"><div class="ml">Sale</div><div class="mv">${saleG}<span class="mu"> g</span></div></div>
-    <div class="metric"><div class="ml">Lievito fresco</div><div class="mv">${lievG}<span class="mu"> g</span></div></div>
-    <div class="metric"><div class="ml">Panetti ~260g</div><div class="mv">${panetti2}<span class="mu"> pz</span></div></div>
-  </div>
-  ${olioG?`<div class="frow"><span class="fl">Olio EVO</span><span class="fv">${olioG} g</span></div>`:''}
-  ${extra.map(e=>`<div class="frow"><span class="fl">${e.l}</span><span class="fv">${e.v} g</span></div>`).join('')}
-  <div class="frow"><span class="fl">Puntata</span><span class="fv">${puntata}</span></div>
-  <div class="frow"><span class="fl">Appretto</span><span class="fv">${appretto}</span></div>
-  <div class="frow"><span class="fl">Maturazione</span><span class="fv">${matur}</span></div>
-  <div class="frow"><span class="fl">Adatta</span><span class="fv"><span class="w-badge ${adatta?'badge-ok':'badge-med'}" style="padding:2px 8px">${adatta?'S\xec':'Parzialmente'}</span></span></div>
-  <div class="fnote">${note}</div>
-</div>`;
-}
-function switchSubFarine(name){
-  const names=['mix','schede','confronto','preferiti'];
-  document.querySelectorAll('.subtab').forEach((el,i)=>el.classList.toggle('active',names[i]===name));
-  names.forEach(n=>{const el=document.getElementById('subfarine-'+n);if(el)el.classList.toggle('active',n===name);});
-  if(name==='preferiti')renderFSaved();
-  if(name==='confronto'){updateCmpSlots();renderCmpTable();}
-  if(name==='schede'){
-    const fl=document.getElementById('f-list'),fs=document.getElementById('f-search'),fp=document.getElementById('f-pills'),det=document.getElementById('f-detail');
-    if(fl)fl.style.display='block';if(fs)fs.style.display='block';if(fp)fp.style.display='flex';if(det)det.style.display='none';
-    renderFList();
-  }
-}
-
 // INIT
 loadPreset('napoletana');
 renderMixer();
-renderFPills();
-renderFList();
 setDay(0);
 </script>
 </body>
