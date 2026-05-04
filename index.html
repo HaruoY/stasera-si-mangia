@@ -103,6 +103,26 @@
     .badge-hi{background:var(--bbg);color:var(--blue)}
     .use-mix-btn{width:100%;padding:11px;background:var(--card);border:0.5px solid var(--bm);border-radius:var(--rsm);font-size:13px;cursor:pointer;color:var(--text);font-family:'DM Sans',sans-serif;margin-top:4px}
     .empty{padding:3rem 0;text-align:center;color:var(--hint);font-size:13px}
+    .chef-mode-btn{flex:1;padding:8px;border:0.5px solid var(--bm);border-radius:var(--rsm);background:var(--card);color:var(--muted);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+    .chef-mode-btn.active{background:var(--text);color:var(--bg);border-color:var(--text)}
+    .chef-step{padding:14px 0;border-bottom:0.5px solid var(--border)}
+    .chef-step:last-child{border:none}
+    .chef-step-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:6px}
+    .chef-step-num{width:24px;height:24px;border-radius:50%;background:var(--text);color:var(--bg);font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+    .chef-step-num.done{background:var(--green)}
+    .chef-step-title{font-size:14px;font-weight:500;flex:1}
+    .chef-step-time{font-size:13px;font-family:'DM Mono',monospace;color:var(--muted)}
+    .chef-step-day{font-size:11px;color:var(--hint);margin-right:4px}
+    .chef-step-body{font-size:13px;color:var(--muted);line-height:1.6;padding-left:34px}
+    .chef-ingredients{background:var(--bg);border-radius:var(--rsm);padding:12px 14px;margin-bottom:12px}
+    .chef-ing-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:0.5px solid var(--border);font-size:13px}
+    .chef-ing-row:last-child{border:none}
+    .chef-ing-name{color:var(--muted)}
+    .chef-ing-val{font-weight:500;font-family:'DM Mono',monospace}
+    .chef-loading{text-align:center;padding:2rem 0;color:var(--muted);font-size:13px}
+    .chef-loading-dot{display:inline-block;animation:pulse 1.2s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
+
     .alert{padding:8px 12px;border-radius:var(--rsm);font-size:12px;margin-bottom:8px}
     .alert-warn{background:var(--abg);color:var(--amber)}
     .alert-info{background:var(--bbg);color:var(--blue)}
@@ -135,6 +155,7 @@
     <div class="tabs">
       <button class="tab active" onclick="switchTab('calc')">Calcola</button>
       <button class="tab" onclick="switchTab('mixer')">Farine</button>
+      <button class="tab" onclick="switchTab('chef')">Chef AI</button>
       <button class="tab" onclick="switchTab('pro')">Pro 🔧</button>
       <button class="tab" onclick="switchTab('saved')">Salvati</button>
       <button class="tab" onclick="switchTab('timer')">Timer</button>
@@ -305,6 +326,72 @@
       <div id="r55-output"></div>
     </div>
 
+  </div>
+
+  <!-- CHEF AI -->
+  <div class="page" id="tab-chef">
+    <div style="margin-top:14px" class="sec-title">Chef AI — pianificatore intelligente</div>
+
+    <div class="card" style="margin-bottom:10px">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6">
+        Descrivi la tua ricetta in linguaggio libero <em>oppure</em> scegli una ricetta salvata. Poi inserisci quando vuoi mangiare e la temperatura ambiente — il resto lo calcola l'AI.
+      </div>
+
+      <!-- Modalità selezione -->
+      <div style="display:flex;gap:6px;margin-bottom:14px">
+        <button id="chef-mode-free" class="chef-mode-btn active" onclick="setChefMode('free')">Scrivi ricetta</button>
+        <button id="chef-mode-saved" class="chef-mode-btn" onclick="setChefMode('saved')">Usa salvata</button>
+      </div>
+
+      <!-- Modalità libera -->
+      <div id="chef-free">
+        <div class="field" style="margin-bottom:10px">
+          <label>Ricetta / metodo (descrivi liberamente)</label>
+          <textarea id="chef-ricetta" rows="5" placeholder="Es: Metodo Margiotta, 1kg farina 0, 730g acqua, 3g lievito, 28g sale, 20g aceto di mele. Autolisi 1h, puntata 30 min, frigo 18h, appretto 6h." style="padding:9px 11px;border:0.5px solid var(--bm);border-radius:var(--rsm);background:var(--card);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;width:100%;resize:vertical;line-height:1.5"></textarea>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Numero panetti</label><input type="number" id="chef-panetti" value="4" min="1"></div>
+          <div class="field"><label>Peso panetto totale (g)</label><input type="number" id="chef-peso" value="250"></div>
+        </div>
+      </div>
+
+      <!-- Modalità ricetta salvata -->
+      <div id="chef-saved" style="display:none">
+        <div class="field" style="margin-bottom:10px">
+          <label>Seleziona ricetta salvata</label>
+          <select id="chef-saved-select" style="padding:9px 11px;border:0.5px solid var(--bm);border-radius:var(--rsm);background:var(--card);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;width:100%">
+            <option value="">— scegli —</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Parametri comuni -->
+      <div class="row2">
+        <div class="field">
+          <label>Quando vuoi mangiare</label>
+          <input type="date" id="chef-data">
+          <div class="date-btns" style="margin-top:5px">
+            <button class="date-btn" onclick="chefSetDay(0)">Oggi</button>
+            <button class="date-btn" onclick="chefSetDay(1)">Domani</button>
+            <button class="date-btn" onclick="chefSetNextWD(6)">Sab</button>
+            <button class="date-btn" onclick="chefSetNextWD(0)">Dom</button>
+          </div>
+        </div>
+        <div class="field"><label>Ora pasto</label><input type="time" id="chef-ora" value="20:00"></div>
+      </div>
+      <div class="row2" style="margin-top:8px">
+        <div class="field"><label>Temperatura ambiente (°C)</label><input type="number" id="chef-temp" value="21"></div>
+        <div class="field"><label>Temperatura frigo (°C)</label><input type="number" id="chef-frigo" value="4"></div>
+      </div>
+
+      <button class="btn-primary" style="margin-top:14px" onclick="chefCalcola()" id="chef-btn">
+        Calcola con AI
+      </button>
+    </div>
+
+    <div id="chef-output"></div>
   </div>
 
 </div>
@@ -843,12 +930,13 @@ function useMixInCalc(){
 // TAB / DATE / UTILS
 // ═══════════════════════════════════════════════════════════════
 function switchTab(t){
-  const names=['calc','mixer','pro','saved','timer'];
+  const names=['calc','mixer','chef','pro','saved','timer'];
   document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',names[i]===t));
   names.forEach(n=>document.getElementById('tab-'+n).classList.toggle('active',n===t));
   if(t==='saved')renderSaved();
   if(t==='timer')renderTimer();
   if(t==='pro'){renderCottura();calcR55();}
+  if(t==='chef'){chefSetDay(0);}
 }
 
 function toInputDate(d){return d.getFullYear()+'-'+(d.getMonth()+1).toString().padStart(2,'0')+'-'+d.getDate().toString().padStart(2,'0');}
@@ -1024,6 +1112,183 @@ function calcR55() {
   <div style="font-size:28px;font-weight:500;font-family:'DM Mono',monospace">${Math.round(Tacqua)}<span style="font-size:14px;color:var(--muted);font-weight:400"> °C</span></div>
 </div>
 <div class="alert ${cls}" style="margin:0">${msg}</div>`;
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// CHEF AI — pianificatore intelligente con Claude API
+// ═══════════════════════════════════════════════════════════════
+
+let chefMode = 'free';
+
+function setChefMode(mode) {
+  chefMode = mode;
+  document.getElementById('chef-mode-free').classList.toggle('active', mode==='free');
+  document.getElementById('chef-mode-saved').classList.toggle('active', mode==='saved');
+  document.getElementById('chef-free').style.display = mode==='free' ? '' : 'none';
+  document.getElementById('chef-saved').style.display = mode==='saved' ? '' : 'none';
+  if (mode === 'saved') populateChefSaved();
+}
+
+function populateChefSaved() {
+  const saves = JSON.parse(localStorage.getItem('pizzaSaves')||'[]');
+  const sel = document.getElementById('chef-saved-select');
+  sel.innerHTML = '<option value="">— scegli —</option>' +
+    saves.map(s => `<option value="${s.id}">${s.name} (${s.date})</option>`).join('');
+}
+
+function chefSetDay(n) { const d=new Date();d.setDate(d.getDate()+n);document.getElementById('chef-data').value=toInputDate(d); }
+function chefSetNextWD(wd) { const d=new Date();const diff=(wd-d.getDay()+7)%7||7;d.setDate(d.getDate()+diff);document.getElementById('chef-data').value=toInputDate(d); }
+
+async function chefCalcola() {
+  const data  = document.getElementById('chef-data').value;
+  const ora   = document.getElementById('chef-ora').value;
+  const temp  = document.getElementById('chef-temp').value;
+  const frigo = document.getElementById('chef-frigo').value;
+
+  if (!data || !ora) { alert('Inserisci data e ora del pasto'); return; }
+
+  let ricettaText = '';
+  let panetti = 4, pesoPanetto = 250;
+
+  if (chefMode === 'free') {
+    ricettaText = document.getElementById('chef-ricetta').value.trim();
+    panetti     = parseInt(document.getElementById('chef-panetti').value) || 4;
+    pesoPanetto = parseFloat(document.getElementById('chef-peso').value) || 250;
+    if (!ricettaText) { alert('Descrivi la ricetta'); return; }
+  } else {
+    const id = document.getElementById('chef-saved-select').value;
+    if (!id) { alert('Seleziona una ricetta salvata'); return; }
+    const saves = JSON.parse(localStorage.getItem('pizzaSaves')||'[]');
+    const s = saves.find(x => x.id === parseInt(id));
+    if (!s) return;
+    const p = s.params;
+    panetti     = p.panetti;
+    pesoPanetto = p.pesoPanetto;
+    ricettaText = `Ricetta salvata: ${s.name}.
+Idratazione: ${p.idr}%, sale: ${p.sale}%, olio: ${p.olio||0}%, aceto di mele: ${p.aceto||0}g/kg.
+Tipo lievito: ${p.tipoLievito||'fresco'}.
+Fasi: ${(p.fasi||[]).map(f=>f.nome+' '+f.ore+'h a '+f.temp+'°C').join(', ')}.`;
+  }
+
+  const eatDateTime = new Date(data + 'T' + ora);
+  const DAYS = ['domenica','lunedì','martedì','mercoledì','giovedì','venerdì','sabato'];
+  const eatStr = `${DAYS[eatDateTime.getDay()]} ${eatDateTime.getDate()}/${eatDateTime.getMonth()+1} alle ${ora}`;
+
+  // Show loading
+  const out = document.getElementById('chef-output');
+  const btn = document.getElementById('chef-btn');
+  btn.disabled = true; btn.textContent = 'Calcolo in corso…';
+  out.innerHTML = `<div class="card chef-loading"><span class="chef-loading-dot">●</span> <span class="chef-loading-dot" style="animation-delay:.2s">●</span> <span class="chef-loading-dot" style="animation-delay:.4s">●</span><div style="margin-top:10px">L'AI sta pianificando il tuo impasto…</div></div>`;
+
+  const prompt = `Sei un esperto pizzaiolo napoletano. L'utente vuole mangiare la pizza ${eatStr}.
+Temperatura ambiente: ${temp}°C. Temperatura frigo: ${frigo}°C.
+Numero panetti: ${panetti}. Peso panetto totale (farina+acqua+sale+olio): ${pesoPanetto}g.
+
+Ricetta / metodo: ${ricettaText}
+
+Calcola e restituisci SOLO un oggetto JSON valido (nessun testo prima o dopo, nessun markdown) con questa struttura esatta:
+{
+  "ingredienti": [
+    {"nome": "Farina", "quantita": "XXXg"},
+    {"nome": "Acqua totale", "quantita": "XXXg"},
+    {"nome": "Sale", "quantita": "XXg"},
+    {"nome": "Lievito fresco", "quantita": "X.Xg"},
+    {"nome": "Olio EVO", "quantita": "XXg"} // solo se previsto
+  ],
+  "note_ingredienti": "breve nota su ingredienti speciali o sostituzioni",
+  "steps": [
+    {
+      "titolo": "Nome della fase",
+      "minuti_prima_del_pasto": 1500,
+      "durata_ore": 1.0,
+      "temperatura": 21,
+      "istruzioni": "Istruzioni pratiche dettagliate passo per passo per questa fase, massimo 3-4 frasi concrete e utili."
+    }
+  ],
+  "consiglio_finale": "Un consiglio pratico finale su cottura o stesura."
+}
+
+Regole:
+- minuti_prima_del_pasto deve essere calcolato contando a ritroso dall'orario del pasto (${ora}) considerando tutte le fasi in sequenza più 30 minuti finali per stesura e cottura
+- Includi sempre come ultimo step "Stesura e cottura" a 30 minuti dal pasto
+- Adatta le quantità al peso panetto totale fornito (farina = peso_totale / (1 + idr + sale_perc + olio_perc))
+- Se è metodo Margiotta, indica nella fase autolisi esattamente quanta acqua usare (circa 80%) e quanta aggiungere dopo
+- Temperatura acqua consigliata: applica regola dei 55 (T_farina + T_amb + T_acqua + attrito_spirale_5°C ≈ 55)
+- Sii preciso sui grammi, usa la matematica corretta`;
+
+  try {
+    // PROXY_URL: sostituisci con il tuo URL Vercel dopo il deploy
+    const PROXY_URL = 'https://pizza-proxy.vercel.app/api/chat'; // ← aggiorna questo
+    const response = await fetch(PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        max_tokens: 1800,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const apiData = await response.json();
+    const raw = apiData.content?.find(b => b.type === 'text')?.text || '';
+    const clean = raw.replace(/```json|```/g,'').trim();
+    const result = JSON.parse(clean);
+
+    renderChefResult(result, eatDateTime, panetti, pesoPanetto);
+
+  } catch(err) {
+    out.innerHTML = `<div class="card"><div class="alert alert-warn">Errore nel calcolo AI: ${err.message}. Controlla la connessione e riprova.</div></div>`;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Calcola con AI';
+  }
+}
+
+function renderChefResult(result, eatDateTime, panetti, pesoPanetto) {
+  const DAYS = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  function fmtDt(d) {
+    const dd = new Date(d); dd.setHours(0,0,0,0);
+    const diff = Math.round((dd-today)/86400000);
+    const dayStr = diff===0?'Oggi':diff===1?'Domani':DAYS[d.getDay()]+' '+d.getDate();
+    return `<span class="chef-step-day">${dayStr}</span>${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+  }
+
+  // Ingredienti
+  const ingHtml = result.ingredienti.map(i =>
+    `<div class="chef-ing-row"><span class="chef-ing-name">${i.nome}</span><span class="chef-ing-val">${i.quantita}</span></div>`
+  ).join('');
+
+  // Timeline steps
+  const stepsHtml = result.steps.map((s, i) => {
+    const stepTime = new Date(eatDateTime.getTime() - s.minuti_prima_del_pasto * 60000);
+    const isDone = Date.now() > stepTime.getTime();
+    return `<div class="chef-step">
+      <div class="chef-step-header">
+        <div class="chef-step-num${isDone?' done':''}">${i+1}</div>
+        <div style="flex:1">
+          <div class="chef-step-title">${s.titolo}</div>
+          <div style="display:flex;gap:10px;margin-top:2px">
+            <span class="chef-step-time">${fmtDt(stepTime)}</span>
+            ${s.durata_ore ? `<span style="font-size:11px;color:var(--hint)">${s.durata_ore}h · ${s.temperatura}°C</span>` : ''}
+          </div>
+        </div>
+      </div>
+      <div class="chef-step-body">${s.istruzioni}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('chef-output').innerHTML = `
+<div class="card">
+  <div class="sec-title">Ingredienti per ${panetti} panetti da ${pesoPanetto}g</div>
+  <div class="chef-ingredients">${ingHtml}</div>
+  ${result.note_ingredienti ? `<div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:4px">${result.note_ingredienti}</div>` : ''}
+</div>
+<div class="card">
+  <div class="sec-title">Programma passo per passo</div>
+  ${stepsHtml}
+</div>
+${result.consiglio_finale ? `<div class="card"><div class="sec-title">Consiglio finale</div><div style="font-size:13px;color:var(--muted);line-height:1.6">${result.consiglio_finale}</div></div>` : ''}`;
 }
 
 // INIT
